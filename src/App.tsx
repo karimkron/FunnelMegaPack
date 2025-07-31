@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { 
   Play,  
   CheckCircle, 
@@ -11,15 +11,44 @@ import {
   Volume2,
   VolumeX,
   Maximize,
-  Minimize
+  Minimize,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 
+// Interfaces para TypeScript
+interface VideoSelection {
+  src: string;
+  index: number;
+}
+
+interface Testimonial {
+  name: string;
+  text: string;
+  rating: number;
+  image: string;
+}
+
+// Declaración para elementos personalizados de Stripe
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      'stripe-buy-button': {
+        'buy-button-id': string;
+        'publishable-key': string;
+        children?: React.ReactNode;
+      };
+    }
+  }
+}
+
 function App() {
-  const [selectedVideo, setSelectedVideo] = useState(null);
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
-  const videoRef = useRef(null);
-  const fullscreenRef = useRef(null);
+  const [selectedVideo, setSelectedVideo] = useState<VideoSelection | null>(null);
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+  const [isMuted, setIsMuted] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const fullscreenRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Load Stripe script
@@ -35,8 +64,8 @@ function App() {
     }
   }, []);
 
-  // Lista de videos en la carpeta public/video
-  const videos = [
+  // Lista de videos en la carpeta public/video - Optimizada para carga rápida
+  const videos: string[] = [
     'video1.mp4',
     'video2.mp4', 
     'video3.mp4',
@@ -47,19 +76,40 @@ function App() {
     'video8.mp4'
   ];
 
-  const handleVideoClick = (videoSrc, index) => {
+  const handleVideoClick = (videoSrc: string, index: number): void => {
+    setIsLoading(true);
     setSelectedVideo({ src: videoSrc, index });
   };
 
-  const closeVideo = () => {
+  const closeVideo = (): void => {
     setSelectedVideo(null);
     setIsFullscreen(false);
+    setIsLoading(false);
     if (videoRef.current) {
       videoRef.current.pause();
     }
   };
 
-  const toggleFullscreen = async () => {
+  const navigateVideo = (direction: 'prev' | 'next'): void => {
+    if (!selectedVideo) return;
+    
+    let newIndex: number;
+    if (direction === 'next') {
+      newIndex = selectedVideo.index + 1 >= videos.length ? 0 : selectedVideo.index + 1;
+    } else {
+      newIndex = selectedVideo.index - 1 < 0 ? videos.length - 1 : selectedVideo.index - 1;
+    }
+    
+    setIsLoading(true);
+    setSelectedVideo({
+      src: `/video/${videos[newIndex]}`,
+      index: newIndex
+    });
+  };
+
+  const toggleFullscreen = async (): Promise<void> => {
+    if (!fullscreenRef.current) return;
+    
     if (!document.fullscreenElement) {
       try {
         await fullscreenRef.current.requestFullscreen();
@@ -77,7 +127,7 @@ function App() {
     }
   };
 
-  const toggleMute = () => {
+  const toggleMute = (): void => {
     if (videoRef.current) {
       videoRef.current.muted = !videoRef.current.muted;
       setIsMuted(!isMuted);
@@ -86,7 +136,7 @@ function App() {
 
   // Manejar el cambio de fullscreen con ESC
   useEffect(() => {
-    const handleFullscreenChange = () => {
+    const handleFullscreenChange = (): void => {
       setIsFullscreen(!!document.fullscreenElement);
     };
 
@@ -94,11 +144,17 @@ function App() {
     return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
   }, []);
 
-  // Cerrar con ESC
+  // Cerrar con ESC y navegación con flechas
   useEffect(() => {
-    const handleKeyPress = (e) => {
+    const handleKeyPress = (e: KeyboardEvent): void => {
       if (e.key === 'Escape') {
         closeVideo();
+      } else if (selectedVideo) {
+        if (e.key === 'ArrowRight') {
+          navigateVideo('next');
+        } else if (e.key === 'ArrowLeft') {
+          navigateVideo('prev');
+        }
       }
     };
 
@@ -108,25 +164,28 @@ function App() {
     }
   }, [selectedVideo]);
 
-  const testimonials = [
+  const testimonials: Testimonial[] = [
     {
       name: "Carlos M.",
       text: "Increíble colección. Mi engagement se disparó desde el primer día. Vale oro.",
-      rating: 5
+      rating: 5,
+      image: "/images/testimonio1.jpeg"
     },
     {
       name: "María L.",
       text: "La calidad es excepcional. Contenido que realmente funciona en redes sociales.",
-      rating: 5
+      rating: 5,
+      image: "/images/testimonio2.jpeg"
     },
     {
       name: "Roberto S.", 
       text: "Mejor inversión para mi negocio digital. Contenido premium que convierte.",
-      rating: 5
+      rating: 5,
+      image: "/images/testimonio3.jpeg"
     }
   ];
 
-  const StripeButton = ({ className = "" }) => (
+  const StripeButton = ({ className = "" }: { className?: string }) => (
     <div className={`stripe-button-container ${className}`}>
       <stripe-buy-button
         buy-button-id="buy_btn_1RqNNQLaDNozqJeSk8ZpYjnQ"
@@ -146,9 +205,10 @@ function App() {
             muted 
             loop 
             playsInline
+            preload="none"
             className="absolute inset-0 w-full h-full object-cover opacity-40"
           >
-            <source src="/public/video/Pack +300 Vídeos de Lifestyle @eugomeshenrique (296).mp4" type="video/mp4" />
+            <source src="/video/fondo.mp4" type="video/mp4" />
             {/* Fallback image if video fails to load */}
             <div className="absolute inset-0 bg-[url('https://images.pexels.com/photos/164634/pexels-photo-164634.jpeg')] bg-cover bg-center opacity-20"></div>
           </video>
@@ -394,7 +454,7 @@ function App() {
         </div>
       </section>
 
-      {/* Visual Gallery Section - ACTUALIZADA CON VIDEOS */}
+      {/* Visual Gallery Section - OPTIMIZADA PARA VELOCIDAD */}
       <section className="py-20 bg-gradient-to-b from-gray-900 via-black to-gray-900 relative overflow-hidden">
         {/* Efectos de fondo lujosos */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-yellow-900/20 via-transparent to-transparent"></div>
@@ -421,20 +481,22 @@ function App() {
                 className="group relative aspect-[9/16] rounded-2xl overflow-hidden cursor-pointer transform transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-yellow-500/25"
                 onClick={() => handleVideoClick(`/video/${video}`, index)}
               >
-                {/* Video preview */}
+                {/* Video preview - Optimizado para carga rápida */}
                 <video 
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   muted
                   loop
                   playsInline
                   preload="metadata"
-                  onMouseEnter={(e) => {
-                    e.target.currentTime = 0;
-                    e.target.play().catch(() => {});
+                  onMouseEnter={(e: React.MouseEvent<HTMLVideoElement>) => {
+                    const target = e.target as HTMLVideoElement;
+                    target.currentTime = 0;
+                    target.play().catch(() => {});
                   }}
-                  onMouseLeave={(e) => {
-                    e.target.pause();
-                    e.target.currentTime = 0;
+                  onMouseLeave={(e: React.MouseEvent<HTMLVideoElement>) => {
+                    const target = e.target as HTMLVideoElement;
+                    target.pause();
+                    target.currentTime = 0;
                   }}
                 >
                   <source src={`/video/${video}`} type="video/mp4" />
@@ -478,7 +540,7 @@ function App() {
           </div>
         </div>
 
-        {/* Modal de video en pantalla completa */}
+        {/* Modal de video en pantalla completa con navegación */}
         {selectedVideo && (
           <div 
             ref={fullscreenRef}
@@ -488,6 +550,12 @@ function App() {
           >
             {/* Video player */}
             <div className="relative w-full h-full max-w-4xl max-h-full flex items-center justify-center">
+              {isLoading && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/80 z-10">
+                  <div className="w-16 h-16 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin"></div>
+                </div>
+              )}
+              
               <video
                 ref={videoRef}
                 className="w-auto h-full max-w-full max-h-full object-contain"
@@ -496,6 +564,7 @@ function App() {
                 muted={isMuted}
                 playsInline
                 onLoadedData={() => {
+                  setIsLoading(false);
                   if (videoRef.current) {
                     videoRef.current.play().catch(() => {});
                   }
@@ -503,6 +572,21 @@ function App() {
               >
                 <source src={selectedVideo.src} type="video/mp4" />
               </video>
+              
+              {/* Navigation arrows */}
+              <button
+                onClick={() => navigateVideo('prev')}
+                className="absolute left-4 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-black/60 hover:bg-yellow-600 rounded-full flex items-center justify-center transition-colors duration-200 z-20"
+              >
+                <ChevronLeft className="w-8 h-8 text-white" />
+              </button>
+              
+              <button
+                onClick={() => navigateVideo('next')}
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-black/60 hover:bg-yellow-600 rounded-full flex items-center justify-center transition-colors duration-200 z-20"
+              >
+                <ChevronRight className="w-8 h-8 text-white" />
+              </button>
               
               {/* Controls overlay */}
               <div className="absolute inset-0 group">
@@ -602,7 +686,7 @@ function App() {
         </div>
       </section>
 
-      {/* Testimonials Section */}
+      {/* Testimonials Section - ACTUALIZADA CON IMÁGENES */}
       <section className="py-20 bg-gradient-to-b from-gray-900 to-black">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -622,12 +706,17 @@ function App() {
                 </div>
                 <p className="text-gray-300 mb-6 text-lg italic">"{testimonial.text}"</p>
                 <div className="flex items-center">
-                  <div className="w-12 h-12 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-full flex items-center justify-center text-black font-bold text-lg mr-4">
-                    {testimonial.name.charAt(0)}
+                  <div className="w-16 h-16 rounded-full overflow-hidden mr-4 border-2 border-yellow-500/30">
+                    <img 
+                      src={testimonial.image} 
+                      alt={testimonial.name}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
                   </div>
                   <div>
                     <div className="font-semibold text-white">{testimonial.name}</div>
-                    <div className="text-sm text-gray-400">Cliente verificado</div>
+                    <div className="text-sm text-yellow-400">Cliente verificado ✓</div>
                   </div>
                 </div>
               </div>
@@ -684,7 +773,7 @@ function App() {
         </div>
       </section>
 
-      {/* FAQ Section */}
+      {/* FAQ Section - ACTUALIZADA CON EMAIL DE SOPORTE */}
       <section className="py-20 bg-gradient-to-b from-gray-900 to-black">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -701,11 +790,11 @@ function App() {
             {[
               {
                 question: "¿Cómo recibo el acceso después de comprar?",
-                answer: "Inmediatamente después del pago recibirás un email con el enlace de acceso a Google Drive. Si no recibes el acceso en 10 minutos, contáctanos enviando tu comprobante de pago y te daremos acceso personalizado al instante."
+                answer: "Después del pago serás redirigido automáticamente a una página especial donde encontrarás un botón para acceder a la carpeta de Google Drive. Simplemente haz clic en 'Acceder a la Carpeta' y luego podrás copiarla a tu propio Drive para acceso directo y permanente. Si tienes problemas, contáctanos a megapack3k@gmail.com"
               },
               {
                 question: "¿Qué hago si compro y no obtengo acceso?",
-                answer: "Si realizaste el pago y no recibiste el acceso, no te preocupes. Contáctanos inmediatamente enviándonos tu comprobante de pago (captura de pantalla o email de confirmación) y te proporcionaremos el enlace de acceso personalizado en menos de 1 hora."
+                answer: "Si realizaste el pago y no fuiste redirigido correctamente, no te preocupes. Envíanos un email a megapack3k@gmail.com con tu comprobante de pago y te proporcionaremos el enlace de acceso personalizado en menos de 1 hora."
               },
               {
                 question: "¿Realmente son 30.000 videos?",
@@ -725,23 +814,23 @@ function App() {
               },
               {
                 question: "¿Qué calidad tienen los videos?",
-                answer: "Todos los videos están en alta definición (HD) y algunos en 4K. Están optimizados específicamente para redes sociales con la mejor calidad posible para formato vertical."
+                answer: "Todos los videos están en alta definición (HD) y muchos en 4K. Están optimizados específicamente para redes sociales con la máxima calidad posible para formato vertical."
               },
               {
                 question: "¿Hay actualizaciones incluidas?",
-                answer: "Sí, recibes acceso de por vida a la carpeta de Google Drive. Esto significa que cuando agreguemos nuevo contenido, automáticamente tendrás acceso sin costo adicional."
+                answer: "Sí, una vez que copies la carpeta a tu Google Drive, recibirás actualizaciones automáticas cuando agreguemos nuevo contenido, sin costo adicional y de por vida."
               },
               {
                 question: "¿Puedo descargar todos los videos?",
-                answer: "Sí, puedes descargar todos los videos a tu dispositivo. También puedes acceder directamente desde Google Drive para usar cuando necesites sin ocupar espacio en tu dispositivo."
+                answer: "Sí, puedes descargar todos los videos a tu dispositivo una vez que tengas la carpeta en tu Google Drive. También puedes acceder directamente desde Drive para usar cuando necesites."
               },
               {
                 question: "¿Ofrecen garantía?",
-                answer: "Sí, ofrecemos garantía de satisfacción del 100%. Si no estás completamente satisfecho con el contenido, contáctanos dentro de los primeros 7 días y te ayudaremos a resolver cualquier problema."
+                answer: "Sí, ofrecemos garantía de satisfacción del 100%. Si no estás completamente satisfecho con el contenido, contáctanos a megapack3k@gmail.com dentro de los primeros 7 días."
               },
               {
                 question: "¿Cómo contacto soporte si tengo problemas?",
-                answer: "Puedes contactarnos enviando un email con tu comprobante de pago. Nuestro equipo de soporte responde en menos de 2 horas y resuelve cualquier problema de acceso inmediatamente."
+                answer: "Puedes contactarnos enviando un email a megapack3k@gmail.com con tu comprobante de pago. Nuestro equipo de soporte responde en menos de 2 horas y resuelve cualquier problema de acceso inmediatamente."
               },
               {
                 question: "¿Esta oferta de 18,95€ es real?",
@@ -766,7 +855,7 @@ function App() {
             ))}
           </div>
           
-          {/* Contact Support Box */}
+          {/* Contact Support Box - ACTUALIZADA */}
           <div className="mt-16 bg-gradient-to-br from-yellow-500/10 to-yellow-600/5 p-8 rounded-2xl border-2 border-yellow-500/30 text-center">
             <div className="w-16 h-16 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
               <span className="text-black font-bold text-2xl">💬</span>
@@ -779,6 +868,9 @@ function App() {
             </p>
             <div className="bg-black/30 p-6 rounded-xl max-w-md mx-auto">
               <h4 className="text-yellow-400 font-bold mb-3">📧 Soporte Directo</h4>
+              <div className="bg-gray-900/50 p-3 rounded-lg mb-3">
+                <p className="text-yellow-300 font-mono text-lg">megapack3k@gmail.com</p>
+              </div>
               <p className="text-gray-300 text-sm mb-2">Envía tu comprobante de pago y te damos acceso personal</p>
               <p className="text-yellow-400 font-semibold">Respuesta en menos de 2 horas</p>
             </div>
@@ -803,7 +895,7 @@ function App() {
               <h4 className="text-white font-semibold mb-3">Contenido</h4>
               <ul className="space-y-2">
                 <li>30.000 videos premium</li>
-                <li>Resolución 4K</li>
+                <li>Resolución hasta 4K</li>
                 <li>Formato vertical optimizado</li>
               </ul>
             </div>
@@ -811,22 +903,22 @@ function App() {
               <h4 className="text-white font-semibold mb-3">Garantías</h4>
               <ul className="space-y-2">
                 <li>Pago 100% seguro</li>
-                <li>Entrega instantánea</li>
+                <li>Acceso instantáneo</li>
                 <li>Soporte técnico incluido</li>
               </ul>
             </div>
             <div>
               <h4 className="text-white font-semibold mb-3">Contacto</h4>
               <ul className="space-y-2">
-                <li>Soporte 24/7</li>
-                <li>Respuesta en 1 hora</li>
+                <li>megapack3k@gmail.com</li>
+                <li>Respuesta en 2 horas</li>
                 <li>Satisfacción garantizada</li>
               </ul>
             </div>
           </div>
           
           <div className="mt-12 pt-8 border-t border-gray-800 text-center text-gray-500 text-sm">
-            <p>© 2024 Mega Pack Videos de Lujo. Todos los derechos reservados.</p>
+            <p>© 2025 Mega Pack Videos de Lujo. Todos los derechos reservados.</p>
           </div>
         </div>
       </footer>
