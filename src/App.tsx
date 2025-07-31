@@ -1,8 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { 
   Play,  
-  CheckCircle, 
-  Star,
+  CheckCircle,
   Shield,
   Zap,
   Crown,
@@ -90,7 +89,7 @@ function App() {
     }
   };
 
-  const navigateVideo = (direction: 'prev' | 'next'): void => {
+const navigateVideo = (direction: 'prev' | 'next'): void => {
     if (!selectedVideo) return;
     
     let newIndex: number;
@@ -100,12 +99,22 @@ function App() {
       newIndex = selectedVideo.index - 1 < 0 ? videos.length - 1 : selectedVideo.index - 1;
     }
     
+    // Pausar el video actual antes de cambiar
+    if (videoRef.current) {
+      videoRef.current.pause();
+      videoRef.current.currentTime = 0;
+    }
+    
     setIsLoading(true);
-    setSelectedVideo({
-      src: `/video/${videos[newIndex]}`,
-      index: newIndex
-    });
-  };
+    
+    // Actualizar directamente el estado con la nueva información
+    setTimeout(() => {
+      setSelectedVideo({
+        src: `/video/${videos[newIndex]}`,
+        index: newIndex
+      });
+    }, 100); // Pequeño delay para que se vea el loading
+  };    
 
   const toggleFullscreen = async (): Promise<void> => {
     if (!fullscreenRef.current) return;
@@ -144,15 +153,17 @@ function App() {
     return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
   }, []);
 
-  // Cerrar con ESC y navegación con flechas
+  // Cerrar con ESC y navegación con flechas - Mejorado
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent): void => {
       if (e.key === 'Escape') {
         closeVideo();
-      } else if (selectedVideo) {
+      } else if (selectedVideo && !isLoading) {
         if (e.key === 'ArrowRight') {
+          e.preventDefault();
           navigateVideo('next');
         } else if (e.key === 'ArrowLeft') {
+          e.preventDefault();
           navigateVideo('prev');
         }
       }
@@ -162,26 +173,26 @@ function App() {
       document.addEventListener('keydown', handleKeyPress);
       return () => document.removeEventListener('keydown', handleKeyPress);
     }
-  }, [selectedVideo]);
+  }, [selectedVideo, isLoading]);
 
   const testimonials: Testimonial[] = [
     {
       name: "Carlos M.",
       text: "Increíble colección. Mi engagement se disparó desde el primer día. Vale oro.",
       rating: 5,
-      image: "/images/testimonio1.jpeg"
+      image: "/image/testimonio1.jpeg"
     },
     {
       name: "María L.",
       text: "La calidad es excepcional. Contenido que realmente funciona en redes sociales.",
       rating: 5,
-      image: "/images/testimonio2.jpeg"
+      image: "/image/testimonio2.jpeg"
     },
     {
       name: "Roberto S.", 
       text: "Mejor inversión para mi negocio digital. Contenido premium que convierte.",
       rating: 5,
-      image: "/images/testimonio3.jpeg"
+      image: "/image/testimonio3.jpeg"
     }
   ];
 
@@ -552,38 +563,52 @@ function App() {
             <div className="relative w-full h-full max-w-4xl max-h-full flex items-center justify-center">
               {isLoading && (
                 <div className="absolute inset-0 flex items-center justify-center bg-black/80 z-10">
-                  <div className="w-16 h-16 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin"></div>
+                  <div className="flex flex-col items-center">
+                    <div className="w-16 h-16 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+                    <p className="text-white text-lg font-semibold">Cargando video...</p>
+                  </div>
                 </div>
               )}
               
               <video
+                key={selectedVideo.src} 
                 ref={videoRef}
                 className="w-auto h-full max-w-full max-h-full object-contain"
                 controls={false}
                 autoPlay
                 muted={isMuted}
                 playsInline
+                preload="auto"
+                onLoadStart={() => setIsLoading(true)}
+                onCanPlay={() => setIsLoading(false)}
                 onLoadedData={() => {
                   setIsLoading(false);
                   if (videoRef.current) {
+                    videoRef.current.currentTime = 0;
                     videoRef.current.play().catch(() => {});
                   }
+                }}
+                onError={() => {
+                  setIsLoading(false);
+                  console.error('Error loading video');
                 }}
               >
                 <source src={selectedVideo.src} type="video/mp4" />
               </video>
               
-              {/* Navigation arrows */}
+              {/* Navigation arrows - Mejoradas */}
               <button
                 onClick={() => navigateVideo('prev')}
-                className="absolute left-4 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-black/60 hover:bg-yellow-600 rounded-full flex items-center justify-center transition-colors duration-200 z-20"
+                disabled={isLoading}
+                className="absolute left-4 top-1/2 transform -translate-y-1/2 w-14 h-14 bg-black/80 hover:bg-yellow-600 rounded-full flex items-center justify-center transition-all duration-200 z-20 disabled:opacity-50 disabled:cursor-not-allowed backdrop-blur-sm"
               >
                 <ChevronLeft className="w-8 h-8 text-white" />
               </button>
               
               <button
                 onClick={() => navigateVideo('next')}
-                className="absolute right-4 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-black/60 hover:bg-yellow-600 rounded-full flex items-center justify-center transition-colors duration-200 z-20"
+                disabled={isLoading}
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 w-14 h-14 bg-black/80 hover:bg-yellow-600 rounded-full flex items-center justify-center transition-all duration-200 z-20 disabled:opacity-50 disabled:cursor-not-allowed backdrop-blur-sm"
               >
                 <ChevronRight className="w-8 h-8 text-white" />
               </button>
@@ -686,7 +711,7 @@ function App() {
         </div>
       </section>
 
-      {/* Testimonials Section - ACTUALIZADA CON IMÁGENES */}
+      {/* Testimonials Section - SOLO IMÁGENES */}
       <section className="py-20 bg-gradient-to-b from-gray-900 to-black">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -698,26 +723,15 @@ function App() {
           
           <div className="grid md:grid-cols-3 gap-8 mb-16">
             {testimonials.map((testimonial, index) => (
-              <div key={index} className="bg-gradient-to-br from-gray-900 to-black p-8 rounded-2xl border border-yellow-500/20">
-                <div className="flex mb-4">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 text-yellow-500 fill-current" />
-                  ))}
-                </div>
-                <p className="text-gray-300 mb-6 text-lg italic">"{testimonial.text}"</p>
-                <div className="flex items-center">
-                  <div className="w-16 h-16 rounded-full overflow-hidden mr-4 border-2 border-yellow-500/30">
-                    <img 
-                      src={testimonial.image} 
-                      alt={testimonial.name}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                    />
-                  </div>
-                  <div>
-                    <div className="font-semibold text-white">{testimonial.name}</div>
-                    <div className="text-sm text-yellow-400">Cliente verificado ✓</div>
-                  </div>
+              <div key={index} className="group transform hover:scale-105 transition-all duration-300">
+                <div className="relative rounded-2xl overflow-hidden border-2 border-yellow-500/30 hover:border-yellow-400/60 transition-colors duration-300">
+                  <img 
+                    src={testimonial.image} 
+                    alt={`Testimonio ${index + 1}`}
+                    className="w-full h-auto object-cover"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </div>
               </div>
             ))}
@@ -918,7 +932,7 @@ function App() {
           </div>
           
           <div className="mt-12 pt-8 border-t border-gray-800 text-center text-gray-500 text-sm">
-            <p>© 2025 Mega Pack Videos de Lujo. Todos los derechos reservados.</p>
+            <p>© 2024 Mega Pack Videos de Lujo. Todos los derechos reservados.</p>
           </div>
         </div>
       </footer>
