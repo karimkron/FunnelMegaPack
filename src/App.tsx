@@ -206,7 +206,7 @@ function App() {
   
 
 
-
+/*
 // Este componente se encarga de renderizar el botón de compra de Stripe en modo test
 
  const StripeButton = ({ className = "" }: { className?: string }) => (
@@ -218,9 +218,10 @@ function App() {
     </stripe-buy-button>
   </div>
 );
+*/
 
 
-  /*
+  
   // Este componente se encarga de renderizar el botón de compra de Stripe real mode
 
  const StripeButton = ({ className = "" }: { className?: string }) => (
@@ -232,7 +233,7 @@ function App() {
     </stripe-buy-button>
   </div>
 );
-*/
+
 
   return (
     <div className="min-h-screen bg-black text-white overflow-x-hidden">
