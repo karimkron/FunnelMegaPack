@@ -1,0 +1,25 @@
+{
+  "name": "Mega Pack Videos de Lujo",
+  "short_name": "MegaPack Luxury",
+  "description": "30.000 Videos de Lujo Premium para Reels, TikTok y Shorts",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#ffd700",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["entertainment", "productivity", "social"],
+  "lang": "es",
+  "dir": "ltr"
+}

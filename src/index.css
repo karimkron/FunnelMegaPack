@@ -4,6 +4,7 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
+/* Reset y optimizaciones básicas */
 * {
   margin: 0;
   padding: 0;
@@ -15,19 +16,37 @@ html {
 }
 
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   background-color: #000000;
   color: #ffffff;
   line-height: 1.6;
   overflow-x: hidden;
+  font-display: swap; /* Optimización de carga de fuentes */
 }
 
-/* Custom serif font for elegant titles */
+/* Optimización de fuentes para móviles */
 .font-serif {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-display: swap;
 }
 
-/* Custom gradients */
+/* Optimización de imágenes y videos */
+img, video {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Lazy loading support */
+img[loading="lazy"] {
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+img[loading="lazy"].loaded {
+  opacity: 1;
+}
+
+/* Custom gradients optimizados */
 .bg-luxury-gradient {
   background: linear-gradient(135deg, #1a1a1a 0%, #000000 50%, #1a1a1a 100%);
 }
@@ -36,27 +55,50 @@ body {
   background: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #ffd700 100%);
 }
 
-/* Custom animations */
+/* Animaciones optimizadas para rendimiento */
 @keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }
 
 .animate-shimmer {
-  animation: shimmer 2s infinite;
-  background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.4), transparent);
-  background-size: 200% 100%;
+  position: relative;
+  overflow: hidden;
 }
 
-/* Stripe button styling */
+.animate-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.4), transparent);
+  animation: shimmer 2s infinite;
+}
+
+/* Contador regresivo */
+@keyframes pulse-red {
+  0%, 100% { 
+    background-color: rgb(220, 38, 38);
+    transform: scale(1);
+  }
+  50% { 
+    background-color: rgb(239, 68, 68);
+    transform: scale(1.05);
+  }
+}
+
+.animate-pulse-red {
+  animation: pulse-red 2s ease-in-out infinite;
+}
+
+/* Stripe button styling optimizado */
 .stripe-button-container {
   display: flex;
   justify-content: center;
   align-items: center;
+  width: 100%;
 }
 
 stripe-buy-button {
@@ -71,8 +113,10 @@ stripe-buy-button {
   --stripe-buy-button-hover-border: 2px solid #ffed4e;
   --stripe-buy-button-hover-text-color: #000000;
   transform: scale(1);
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+  width: auto;
+  min-width: 200px;
 }
 
 stripe-buy-button:hover {
@@ -80,9 +124,26 @@ stripe-buy-button:hover {
   box-shadow: 0 15px 40px rgba(255, 215, 0, 0.5);
 }
 
-/* Custom scrollbar */
+/* Tamaños responsive para Stripe button */
+@media (max-width: 768px) {
+  stripe-buy-button {
+    --stripe-buy-button-font-size: 16px;
+    --stripe-buy-button-padding: 14px 24px;
+    min-width: 180px;
+  }
+}
+
+@media (max-width: 480px) {
+  stripe-buy-button {
+    --stripe-buy-button-font-size: 14px;
+    --stripe-buy-button-padding: 12px 20px;
+    min-width: 160px;
+  }
+}
+
+/* Custom scrollbar optimizado */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -91,28 +152,27 @@ stripe-buy-button:hover {
 
 ::-webkit-scrollbar-thumb {
   background: linear-gradient(135deg, #ffd700, #ffed4e);
-  border-radius: 4px;
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(135deg, #ffed4e, #ffd700);
 }
 
-/* Responsive optimizations */
-@media (max-width: 768px) {
-  .stripe-button-container stripe-buy-button {
-    --stripe-buy-button-font-size: 16px;
-    --stripe-buy-button-padding: 14px 28px;
-  }
+/* Loading animations optimizadas */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
-/* Loading animation */
 @keyframes pulse-gold {
   0%, 100% {
     opacity: 1;
+    transform: scale(1);
   }
   50% {
-    opacity: 0.7;
+    opacity: 0.8;
+    transform: scale(1.05);
   }
 }
 
@@ -120,25 +180,37 @@ stripe-buy-button:hover {
   animation: pulse-gold 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-/* Luxury hover effects */
+/* Hover effects optimizados para móviles */
 .luxury-hover {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.luxury-hover:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 25px 50px -12px rgba(255, 215, 0, 0.25);
+@media (hover: hover) {
+  .luxury-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px -12px rgba(255, 215, 0, 0.25);
+  }
 }
 
-/* Background patterns */
-.bg-luxury-pattern {
+/* Optimizaciones para touch devices */
+@media (hover: none) {
+  .luxury-hover:active {
+    transform: scale(0.98);
+  }
+}
+
+/* Background patterns con mejor rendimiento */
+.bg-luxury-pattern::before {
+  content: '';
+  position: absolute;
+  inset: 0;
   background-image: 
-    radial-gradient(circle at 25% 25%, #ffd700 0%, transparent 50%),
-    radial-gradient(circle at 75% 75%, #ffed4e 0%, transparent 50%);
-  opacity: 0.05;
+    radial-gradient(circle at 25% 25%, rgba(255, 215, 0, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(255, 237, 78, 0.05) 0%, transparent 50%);
+  pointer-events: none;
 }
 
-/* Text selection */
+/* Text selection optimizado */
 ::selection {
   background-color: #ffd700;
   color: #000000;
@@ -147,4 +219,122 @@ stripe-buy-button:hover {
 ::-moz-selection {
   background-color: #ffd700;
   color: #000000;
+}
+
+/* Optimizaciones específicas para móviles */
+@media (max-width: 768px) {
+  /* Reduce motion para usuarios que lo prefieren */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* Mejora la legibilidad en pantallas pequeñas */
+  body {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  /* Espaciado optimizado para touch */
+  button, a[role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Mejora el contraste en móviles */
+  .text-gray-300 {
+    color: #d1d5db;
+  }
+
+  .text-gray-400 {
+    color: #9ca3af;
+  }
+}
+
+/* Optimizaciones para pantallas de alta resolución */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  /* Mejora la calidad de gradientes en pantallas retina */
+  .bg-gradient-to-r {
+    background-size: 200% 100%;
+  }
+}
+
+/* Mejoras de accesibilidad */
+@media (prefers-contrast: high) {
+  .text-gray-300 {
+    color: #ffffff;
+  }
+  
+  .text-gray-400 {
+    color: #e5e7eb;
+  }
+  
+  .border-yellow-500\/20 {
+    border-color: rgba(234, 179, 8, 0.5);
+  }
+}
+
+/* Optimización para focus states */
+button:focus-visible, 
+a:focus-visible,
+details summary:focus-visible {
+  outline: 2px solid #ffd700;
+  outline-offset: 2px;
+}
+
+/* Prevención de scroll horizontal en móviles */
+html, body {
+  overflow-x: hidden;
+}
+
+/* Optimización de rendimiento para animaciones */
+.transform {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Mejora la velocidad de scroll en iOS */
+* {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Critical CSS para above-the-fold */
+.hero-section {
+  contain: layout style paint;
+}
+
+/* Optimización de video thumbnails */
+.video-thumbnail {
+  background-color: #111;
+  background-image: linear-gradient(45deg, #222 25%, transparent 25%), 
+                    linear-gradient(-45deg, #222 25%, transparent 25%), 
+                    linear-gradient(45deg, transparent 75%, #222 75%), 
+                    linear-gradient(-45deg, transparent 75%, #222 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+}
+
+/* Mejoras para el CTA flotante */
+.floating-cta {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+}
+
+/* Optimización para detalles/FAQ */
+details[open] summary {
+  border-bottom: 1px solid rgba(234, 179, 8, 0.2);
+  margin-bottom: 1rem;
+}
+
+/* Transiciones suaves para el contador */
+.countdown-digit {
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-block;
+  min-width: 2ch;
+  text-align: center;
 }

@@ -3,39 +3,97 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Mega Pack de 30.000 Videos de Lujo para Reels, TikTok y Shorts. Contenido premium lifestyle de coches, yates, mansiones y viajes de lujo. ¡Oferta limitada 18,95€!" />
-    <meta name="keywords" content="videos lujo, reels, tiktok, shorts, contenido premium, lifestyle, coches lujo, yates, mansiones" />
-    <meta property="og:title" content="Mega Pack 30.000 Videos de Lujo - Reels, TikTok y Shorts" />
-    <meta property="og:description" content="Transforma tu perfil en una marca de lujo con 30.000 videos premium. ¡Solo 18,95€ por tiempo limitado!" />
-    <meta property="og:type" content="website" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    
+    <!-- SEO Meta Tags Optimizados -->
+    <meta name="description" content="🔥 Mega Pack de 30.000 Videos de Lujo Premium para Reels, TikTok y YouTube Shorts. Contenido exclusivo lifestyle: coches, yates, mansiones. ¡Solo 18,95€! Entrega inmediata." />
+    <meta name="keywords" content="videos lujo premium, reels tiktok, youtube shorts, contenido viral, lifestyle millonario, coches lujo, yates mansiones, pack videos 4K, mega pack viral" />
+    <meta name="author" content="Mega Pack Videos de Lujo" />
+    <meta name="robots" content="index, follow" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="product" />
+    <meta property="og:title" content="🔥 30.000 Videos de Lujo Premium - Solo 18,95€ (Antes 97€)" />
+    <meta property="og:description" content="Transforma tu perfil en una marca de lujo con contenido viral exclusivo. Coches, yates, mansiones y lifestyle millonario. ¡Oferta limitada!" />
+    <meta property="og:url" content="https://megapackluxury.com" />
+    <meta property="og:site_name" content="Mega Pack Videos de Lujo" />
+    <meta property="og:locale" content="es_ES" />
+    <meta property="product:price:amount" content="18.95" />
+    <meta property="product:price:currency" content="EUR" />
+    
+    <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Mega Pack 30.000 Videos de Lujo - Reels, TikTok y Shorts" />
-    <meta name="twitter:description" content="Transforma tu perfil en una marca de lujo con 30.000 videos premium. ¡Solo 18,95€ por tiempo limitado!" />
+    <meta name="twitter:title" content="🔥 30.000 Videos de Lujo Premium - Solo 18,95€" />
+    <meta name="twitter:description" content="Contenido viral exclusivo para Reels, TikTok y Shorts. ¡81% de descuento por tiempo limitado!" />
+    <meta name="twitter:creator" content="@MegaPackLuxury" />
     
-    <title>Mega Pack 30.000 Videos de Lujo - Reels, TikTok y Shorts | Oferta Limitada 18,95€</title>
+    <!-- Structured Data JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      "name": "Mega Pack 30.000 Videos de Lujo Premium",
+      "description": "Pack exclusivo de 30.000 videos de lujo en HD/4K para redes sociales. Contenido lifestyle premium: coches, yates, mansiones, viajes de lujo.",
+      "brand": {
+        "@type": "Brand",
+        "name": "Mega Pack Videos de Lujo"
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": "18.95",
+        "priceCurrency": "EUR",
+        "availability": "https://schema.org/InStock",
+        "validThrough": "2024-12-31",
+        "priceValidUntil": "2024-12-31"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.9",
+        "reviewCount": "147"
+      }
+    }
+    </script>
     
-    <!-- Preload critical resources -->
+    <title>🔥 Mega Pack 30.000 Videos de Lujo Premium - Solo 18,95€ (81% DESC) | Reels, TikTok, Shorts</title>
+    
+    <!-- Preconnect para recursos críticos -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://images.pexels.com">
     <link rel="preconnect" href="https://js.stripe.com">
+    <link rel="preconnect" href="https://images.pexels.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
     
-    <!-- Critical CSS for above-the-fold content -->
+    <!-- Preload recursos críticos -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    
+    <!-- Fallback para fonts -->
+    <noscript>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap">
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&display=swap">
+    </noscript>
+    
+    <!-- Critical CSS inline para above-the-fold -->
     <style>
+      /* Critical above-the-fold styles */
       body { 
         margin: 0; 
         background: #000; 
         color: #fff; 
-        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        line-height: 1.6;
+        font-display: swap;
       }
+      
       .loading { 
         display: flex; 
+        flex-direction: column;
         justify-content: center; 
         align-items: center; 
         height: 100vh; 
         background: #000;
       }
+      
       .loading::after {
         content: '';
         width: 40px;
@@ -44,46 +102,210 @@
         border-top: 3px solid #ffd700;
         border-radius: 50%;
         animation: spin 1s linear infinite;
+        margin-bottom: 1rem;
       }
+      
+      .loading-text {
+        color: #ffd700;
+        font-weight: 600;
+        font-size: 0.875rem;
+      }
+      
       @keyframes spin {
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
       }
+      
+      /* Prevent flash of unstyled content */
+      .hero-section {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #000 0%, #1a1a1a 50%, #000 100%);
+      }
+      
+      /* Mobile optimizations */
+      @media (max-width: 768px) {
+        body {
+          font-size: 16px;
+          -webkit-text-size-adjust: 100%;
+        }
+      }
+      
+      /* Reduce motion for users who prefer it */
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
     </style>
+    
+    <!-- Web App Manifest para PWA -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Mega Pack Luxury">
+    
+    <!-- Favicon optimizado -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    
+    <!-- Security headers -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
   </head>
+  
   <body>
+    <!-- Loading screen optimizado -->
     <div id="root">
-      <div class="loading"></div>
+      <div class="loading">
+        <div class="loading-text">Cargando experiencia premium...</div>
+      </div>
     </div>
+    
+    <!-- Main React app -->
     <script type="module" src="/src/main.tsx"></script>
     
-    <!-- Stripe Script -->
-    <script async src="https://js.stripe.com/v3/buy-button.js"></script>
-    
-    <!-- Performance optimization script -->
+    <!-- Stripe Script con loading asíncrono -->
     <script>
-      // Optimize images loading
+      // Load Stripe script asynchronously
+      (function() {
+        const script = document.createElement('script');
+        script.src = 'https://js.stripe.com/v3/buy-button.js';
+        script.async = true;
+        script.defer = true;
+        document.head.appendChild(script);
+      })();
+    </script>
+    
+    <!-- Performance optimizations -->
+    <script>
+      // Optimize image loading with Intersection Observer
       document.addEventListener('DOMContentLoaded', function() {
-        const images = document.querySelectorAll('img[data-src]');
-        const imageObserver = new IntersectionObserver((entries, observer) => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting) {
-              const img = entry.target;
-              img.src = img.dataset.src;
-              img.classList.remove('lazy');
-              imageObserver.unobserve(img);
-            }
+        // Lazy loading images
+        if ('IntersectionObserver' in window) {
+          const imageObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+              if (entry.isIntersecting) {
+                const img = entry.target;
+                if (img.dataset.src) {
+                  img.src = img.dataset.src;
+                  img.classList.remove('lazy');
+                  img.classList.add('loaded');
+                  imageObserver.unobserve(img);
+                }
+              }
+            });
+          }, {
+            rootMargin: '50px 0px',
+            threshold: 0.01
           });
+
+          // Observe all lazy images
+          document.querySelectorAll('img[data-src]').forEach(img => {
+            imageObserver.observe(img);
+          });
+        }
+
+        // Preload critical resources
+        const criticalResources = [
+          'https://js.stripe.com/v3/buy-button.js'
+        ];
+
+        criticalResources.forEach(url => {
+          const link = document.createElement('link');
+          link.rel = 'preload';
+          link.href = url;
+          link.as = 'script';
+          document.head.appendChild(link);
         });
-        images.forEach(img => imageObserver.observe(img));
       });
-      
-      // Preload critical Stripe resources
-      const link = document.createElement('link');
-      link.rel = 'preload';
-      link.href = 'https://js.stripe.com/v3/buy-button.js';
-      link.as = 'script';
-      document.head.appendChild(link);
+
+      // Service Worker registration for caching
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('/sw.js')
+            .then(function(registration) {
+              console.log('SW registered: ', registration);
+            }, function(registrationError) {
+              console.log('SW registration failed: ', registrationError);
+            });
+        });
+      }
+
+      // Performance monitoring
+      window.addEventListener('load', function() {
+        if ('performance' in window) {
+          setTimeout(function() {
+            const perfData = performance.getEntriesByType('navigation')[0];
+            if (perfData) {
+              console.log('Page load time:', perfData.loadEventEnd - perfData.fetchStart, 'ms');
+            }
+          }, 0);
+        }
+      });
+
+      // Error tracking
+      window.addEventListener('error', function(e) {
+        console.error('JavaScript error:', e.error);
+      });
+
+      // Unhandled promise rejection tracking
+      window.addEventListener('unhandledrejection', function(e) {
+        console.error('Unhandled promise rejection:', e.reason);
+      });
+    </script>
+
+    <!-- Google Analytics (opcional - reemplazar con tu ID) -->
+    <!-- 
+    <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'GA_MEASUREMENT_ID');
+    </script>
+    -->
+
+    <!-- Facebook Pixel (opcional - reemplazar con tu ID) -->
+    <!--
+    <script>
+      !function(f,b,e,v,n,t,s)
+      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)}(window, document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', 'YOUR_PIXEL_ID');
+      fbq('track', 'PageView');
+    </script>
+    <noscript>
+      <img height="1" width="1" style="display:none"
+           src="https://www.facebook.com/tr?id=YOUR_PIXEL_ID&ev=PageView&noscript=1"/>
+    </noscript>
+    -->
+
+    <!-- Schema.org LocalBusiness (opcional si tienes negocio local) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Mega Pack Videos de Lujo",
+      "url": "https://megapackluxury.com",
+      "description": "Proveedor líder de contenido de video premium para redes sociales",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "email": "megapack3k@gmail.com",
+        "contactType": "customer service",
+        "availableLanguage": "Spanish"
+      }
+    }
     </script>
   </body>
 </html>
