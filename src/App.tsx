@@ -57,72 +57,88 @@ function App() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const fullscreenRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
-  const stripeScriptRef = useRef<HTMLScriptElement | null>(null);
 
-  // Cargar Stripe de forma estable y controlada
+  // ✅ SOLUCIÓN: Carga simple y efectiva de Stripe sin bucles
   useEffect(() => {
     let mounted = true;
+    let timeoutId: NodeJS.Timeout;
 
-    const loadStripe = async () => {
-      try {
-        // Verificar si ya existe el script
-        const existingScript = document.querySelector('script[src="https://js.stripe.com/v3/buy-button.js"]');
+    const checkStripeLoaded = () => {
+      // Verificar si el elemento customizado está definido
+      const isStripeElementDefined = customElements.get('stripe-buy-button');
+      
+      if (isStripeElementDefined && mounted) {
+        setStripeLoaded(true);
+        setStripeError(false);
+        return;
+      }
+
+      // Si no hay script, crearlo
+      if (!document.querySelector('script[src*="stripe.com/v3/buy-button.js"]')) {
+        const script = document.createElement("script");
+        script.src = "https://js.stripe.com/v3/buy-button.js";
+        script.async = true;
         
-        if (existingScript) {
-          // Si ya existe, verificar si está cargado
-          if ((window as any).stripe) {
-            if (mounted) setStripeLoaded(true);
-            return;
+        script.onload = () => {
+          if (mounted) {
+            // Esperar un poco para que Stripe registre el custom element
+            setTimeout(() => {
+              if (mounted) {
+                setStripeLoaded(true);
+                setStripeError(false);
+              }
+            }, 500);
           }
-        }
+        };
 
-        // Crear nuevo script solo si no existe
-        if (!existingScript) {
-          const script = document.createElement("script");
-          script.src = "https://js.stripe.com/v3/buy-button.js";
-          script.async = true;
-          script.defer = true;
-          
-          script.onload = () => {
+        script.onerror = () => {
+          if (mounted) {
+            console.error('Error loading Stripe script');
+            setStripeError(true);
+            setStripeLoaded(false);
+          }
+        };
+
+        document.head.appendChild(script);
+
+        // Timeout de seguridad
+        timeoutId = setTimeout(() => {
+          if (mounted && !stripeLoaded) {
+            console.warn('Stripe script timeout');
+            setStripeError(true);
+          }
+        }, 15000);
+      } else {
+        // Si el script ya existe, verificar el custom element periódicamente
+        const checkInterval = setInterval(() => {
+          if (customElements.get('stripe-buy-button')) {
+            clearInterval(checkInterval);
             if (mounted) {
               setStripeLoaded(true);
               setStripeError(false);
             }
-          };
+          }
+        }, 100);
 
-          script.onerror = () => {
-            if (mounted) {
-              setStripeError(true);
-              setStripeLoaded(false);
-            }
-          };
-
-          // Timeout de seguridad
-          setTimeout(() => {
-            if (mounted && !stripeLoaded) {
-              setStripeError(true);
-            }
-          }, 10000); // 10 segundos
-
-          stripeScriptRef.current = script;
-          document.head.appendChild(script);
-        }
-      } catch (error) {
-        console.error('Error loading Stripe:', error);
-        if (mounted) {
-          setStripeError(true);
-          setStripeLoaded(false);
-        }
+        // Limpiar el intervalo después de 10 segundos
+        timeoutId = setTimeout(() => {
+          clearInterval(checkInterval);
+          if (mounted && !stripeLoaded) {
+            setStripeError(true);
+          }
+        }, 10000);
       }
     };
 
-    loadStripe();
+    checkStripeLoaded();
 
     return () => {
       mounted = false;
-      // No eliminar el script para evitar recargas innecesarias
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
     };
-  }, []);
+  }, []); // ✅ Dependencias vacías para evitar re-ejecuciones
 
   // Countdown timer effect
   useEffect(() => {
@@ -282,37 +298,9 @@ function App() {
     { image: "/image/testimonio3.jpeg" },
   ];
 
-  // Componente mejorado del botón de Stripe con manejo de errores
+  // ✅ SOLUCIÓN: Componente mejorado del botón de Stripe sin bucles
   const StripeButton = ({ className = "", size = "normal" }: { className?: string; size?: "normal" | "large" | "small" }) => {
-    const retryStripe = () => {
-      setStripeError(false);
-      setStripeLoaded(false);
-      
-      // Eliminar script existente si hay error
-      const existingScript = document.querySelector('script[src="https://js.stripe.com/v3/buy-button.js"]');
-      if (existingScript) {
-        existingScript.remove();
-      }
-
-      // Recargar script
-      const script = document.createElement("script");
-      script.src = "https://js.stripe.com/v3/buy-button.js";
-      script.async = true;
-      script.defer = true;
-      
-      script.onload = () => {
-        setStripeLoaded(true);
-        setStripeError(false);
-      };
-
-      script.onerror = () => {
-        setStripeError(true);
-        setStripeLoaded(false);
-      };
-
-      document.head.appendChild(script);
-    };
-
+    
     // Si hay error de Stripe, mostrar botón de reintento
     if (stripeError) {
       return (
@@ -322,7 +310,7 @@ function App() {
               ⚠️ Error al cargar el botón de pago
             </p>
             <button
-              onClick={retryStripe}
+              onClick={() => window.location.reload()} // Recargar página en caso de error
               className="bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-2 px-6 rounded-lg transition-colors duration-300"
             >
               Reintentar
@@ -349,14 +337,13 @@ function App() {
       );
     }
 
-    // Botón de Stripe cargado correctamente
+    // ✅ Botón de Stripe cargado correctamente
     return (
       <div className={`stripe-button-container ${className}`}>
         <stripe-buy-button
           buy-button-id="buy_btn_1Rr68CLaDNozqJeSJQvmCkuQ"
           publishable-key="pk_live_51RRNGqLaDNozqJeSsBCif37utfiEfn2lcvPrCCuJ4RpJMNKT3ohVa0Kvy2vnaFbEOO231uSs424Bh1eyEkM9lZ8500P7IXhWnI"
-        >
-        </stripe-buy-button>
+        />
       </div>
     );
   };
