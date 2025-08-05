@@ -169,17 +169,8 @@
     <!-- Main React app -->
     <script type="module" src="/src/main.tsx"></script>
     
-    <!-- Stripe Script con loading asíncrono -->
-    <script>
-      // Load Stripe script asynchronously
-      (function() {
-        const script = document.createElement('script');
-        script.src = 'https://js.stripe.com/v3/buy-button.js';
-        script.async = true;
-        script.defer = true;
-        document.head.appendChild(script);
-      })();
-    </script>
+    <!-- ✅ ELIMINADO: El script de Stripe que causaba el conflicto -->
+    <!-- Ahora se carga solo desde React de forma controlada -->
     
     <!-- Performance optimizations -->
     <script>
@@ -209,19 +200,6 @@
             imageObserver.observe(img);
           });
         }
-
-        // Preload critical resources
-        const criticalResources = [
-          'https://js.stripe.com/v3/buy-button.js'
-        ];
-
-        criticalResources.forEach(url => {
-          const link = document.createElement('link');
-          link.rel = 'preload';
-          link.href = url;
-          link.as = 'script';
-          document.head.appendChild(link);
-        });
       });
 
       // Service Worker registration for caching
