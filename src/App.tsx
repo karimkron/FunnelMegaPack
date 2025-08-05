@@ -46,6 +46,8 @@ function App() {
   const [isMuted, setIsMuted] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showFloatingCTA, setShowFloatingCTA] = useState<boolean>(false);
+  const [stripeLoaded, setStripeLoaded] = useState<boolean>(false);
+  const [stripeError, setStripeError] = useState<boolean>(false);
   const [timeLeft, setTimeLeft] = useState<{
     hours: number;
     minutes: number;
@@ -55,18 +57,70 @@ function App() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const fullscreenRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
+  const stripeScriptRef = useRef<HTMLScriptElement | null>(null);
 
+  // Cargar Stripe de forma estable y controlada
   useEffect(() => {
-    // Load Stripe script
-    const script = document.createElement("script");
-    script.src = "https://js.stripe.com/v3/buy-button.js";
-    script.async = true;
-    document.head.appendChild(script);
+    let mounted = true;
+
+    const loadStripe = async () => {
+      try {
+        // Verificar si ya existe el script
+        const existingScript = document.querySelector('script[src="https://js.stripe.com/v3/buy-button.js"]');
+        
+        if (existingScript) {
+          // Si ya existe, verificar si está cargado
+          if ((window as any).stripe) {
+            if (mounted) setStripeLoaded(true);
+            return;
+          }
+        }
+
+        // Crear nuevo script solo si no existe
+        if (!existingScript) {
+          const script = document.createElement("script");
+          script.src = "https://js.stripe.com/v3/buy-button.js";
+          script.async = true;
+          script.defer = true;
+          
+          script.onload = () => {
+            if (mounted) {
+              setStripeLoaded(true);
+              setStripeError(false);
+            }
+          };
+
+          script.onerror = () => {
+            if (mounted) {
+              setStripeError(true);
+              setStripeLoaded(false);
+            }
+          };
+
+          // Timeout de seguridad
+          setTimeout(() => {
+            if (mounted && !stripeLoaded) {
+              setStripeError(true);
+            }
+          }, 10000); // 10 segundos
+
+          stripeScriptRef.current = script;
+          document.head.appendChild(script);
+        }
+      } catch (error) {
+        console.error('Error loading Stripe:', error);
+        if (mounted) {
+          setStripeError(true);
+          setStripeLoaded(false);
+        }
+      }
+    };
+
+    loadStripe();
 
     return () => {
-      if (document.head.contains(script)) {
-        document.head.removeChild(script);
-      }
+      mounted = false;
+      // No eliminar el script para evitar recargas innecesarias
     };
   }, []);
 
@@ -228,14 +282,74 @@ function App() {
     { image: "/image/testimonio3.jpeg" },
   ];
 
-  // Botón de compra de Stripe en modo producción
+  // Componente mejorado del botón de Stripe con manejo de errores
   const StripeButton = ({ className = "", size = "normal" }: { className?: string; size?: "normal" | "large" | "small" }) => {
-    const sizeClasses = {
-      small: "text-sm px-4 py-2",
-      normal: "text-lg px-6 py-3",
-      large: "text-xl px-8 py-4"
+    const retryStripe = () => {
+      setStripeError(false);
+      setStripeLoaded(false);
+      
+      // Eliminar script existente si hay error
+      const existingScript = document.querySelector('script[src="https://js.stripe.com/v3/buy-button.js"]');
+      if (existingScript) {
+        existingScript.remove();
+      }
+
+      // Recargar script
+      const script = document.createElement("script");
+      script.src = "https://js.stripe.com/v3/buy-button.js";
+      script.async = true;
+      script.defer = true;
+      
+      script.onload = () => {
+        setStripeLoaded(true);
+        setStripeError(false);
+      };
+
+      script.onerror = () => {
+        setStripeError(true);
+        setStripeLoaded(false);
+      };
+
+      document.head.appendChild(script);
     };
-    
+
+    // Si hay error de Stripe, mostrar botón de reintento
+    if (stripeError) {
+      return (
+        <div className={`stripe-error-container ${className}`}>
+          <div className="bg-red-900/20 border border-red-500/30 rounded-xl p-4 text-center">
+            <p className="text-red-400 mb-3 text-sm">
+              ⚠️ Error al cargar el botón de pago
+            </p>
+            <button
+              onClick={retryStripe}
+              className="bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-2 px-6 rounded-lg transition-colors duration-300"
+            >
+              Reintentar
+            </button>
+            <p className="text-gray-400 text-xs mt-2">
+              O contacta: megapack3k@gmail.com
+            </p>
+          </div>
+        </div>
+      );
+    }
+
+    // Si está cargando, mostrar spinner
+    if (!stripeLoaded) {
+      return (
+        <div className={`stripe-loading-container ${className}`}>
+          <div className="bg-gray-900/50 border border-yellow-500/30 rounded-xl p-4 text-center">
+            <div className="flex items-center justify-center mb-2">
+              <div className="w-6 h-6 border-2 border-yellow-500 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+            <p className="text-yellow-400 text-sm">Cargando botón de pago...</p>
+          </div>
+        </div>
+      );
+    }
+
+    // Botón de Stripe cargado correctamente
     return (
       <div className={`stripe-button-container ${className}`}>
         <stripe-buy-button
