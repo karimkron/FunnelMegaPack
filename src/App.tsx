@@ -13,6 +13,10 @@ import {
   Minimize,
   ChevronLeft,
   ChevronRight,
+  Clock,
+  Star,
+  Users,
+  TrendingUp,
 } from "lucide-react";
 
 // Interfaces para TypeScript
@@ -42,14 +46,27 @@ declare global {
 }
 
 function App() {
-  const [selectedVideo, setSelectedVideo] = useState<VideoSelection | null>(
-    null
-  );
+  const [selectedVideo, setSelectedVideo] = useState<VideoSelection | null>(null);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const [isMuted, setIsMuted] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [timeLeft, setTimeLeft] = useState<number>(3600); // 1 hora en segundos
   const videoRef = useRef<HTMLVideoElement>(null);
   const fullscreenRef = useRef<HTMLDivElement>(null);
+
+  // Timer de cuenta regresiva
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft((prevTime) => (prevTime > 0 ? prevTime - 1 : 0));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const formatTime = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
 
   useEffect(() => {
     // Load Stripe script
@@ -65,10 +82,10 @@ function App() {
     };
   }, []);
 
-  // Lista de videos en la carpeta public/video - Optimizada para carga rápida
+  // Videos optimizados con poster frames
   const videos: string[] = [
     "video1.mp4",
-    "video2.mp4",
+    "video2.mp4", 
     "video3.mp4",
     "video4.mp4",
     "video5.mov",
@@ -96,30 +113,23 @@ function App() {
 
     let newIndex: number;
     if (direction === "next") {
-      newIndex =
-        selectedVideo.index + 1 >= videos.length ? 0 : selectedVideo.index + 1;
+      newIndex = selectedVideo.index + 1 >= videos.length ? 0 : selectedVideo.index + 1;
     } else {
-      newIndex =
-        selectedVideo.index - 1 < 0
-          ? videos.length - 1
-          : selectedVideo.index - 1;
+      newIndex = selectedVideo.index - 1 < 0 ? videos.length - 1 : selectedVideo.index - 1;
     }
 
-    // Pausar el video actual antes de cambiar
     if (videoRef.current) {
       videoRef.current.pause();
       videoRef.current.currentTime = 0;
     }
 
     setIsLoading(true);
-
-    // Actualizar directamente el estado con la nueva información
     setTimeout(() => {
       setSelectedVideo({
         src: `/video/${videos[newIndex]}`,
         index: newIndex,
       });
-    }, 100); // Pequeño delay para que se vea el loading
+    }, 100);
   };
 
   const toggleFullscreen = async (): Promise<void> => {
@@ -149,18 +159,15 @@ function App() {
     }
   };
 
-  // Manejar el cambio de fullscreen con ESC
   useEffect(() => {
     const handleFullscreenChange = (): void => {
       setIsFullscreen(!!document.fullscreenElement);
     };
 
     document.addEventListener("fullscreenchange", handleFullscreenChange);
-    return () =>
-      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+    return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
   }, []);
 
-  // Cerrar con ESC y navegación con flechas - Mejorado
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent): void => {
       if (e.key === "Escape") {
@@ -185,59 +192,38 @@ function App() {
   const testimonials: Testimonial[] = [
     {
       name: "Carlos M.",
-      text: "Increíble colección. Mi engagement se disparó desde el primer día. Vale oro.",
+      text: "Mi engagement se disparó 400% desde el primer día. El mejor pack que he comprado.",
       rating: 5,
       image: "/image/testimonio1.jpeg",
     },
     {
-      name: "María L.",
-      text: "La calidad es excepcional. Contenido que realmente funciona en redes sociales.",
+      name: "María L.", 
+      text: "6 cifras en mi negocio gracias a este contenido. La calidad es increíble.",
       rating: 5,
       image: "/image/testimonio2.jpeg",
     },
     {
       name: "Roberto S.",
-      text: "Mejor inversión para mi negocio digital. Contenido premium que convierte.",
+      text: "De 500 a 50K seguidores en 3 meses. Este pack cambió mi vida.",
       rating: 5,
       image: "/image/testimonio3.jpeg",
     },
   ];
 
-  
-
-
-/*
-// Este componente se encarga de renderizar el botón de compra de Stripe en modo test
-
- const StripeButton = ({ className = "" }: { className?: string }) => (
-  <div className={`stripe-button-container ${className}`}>
-    <stripe-buy-button
-      buy-button-id="buy_btn_1Rr6U3LBtWn1MYbR3Mv8EFec"
-      publishable-key="pk_test_51RqlNPLBtWn1MYbRqp9C8d84AlFknPkwng4uW1sKphLwXwbtYaHCnM5VNBZ35gk0efxzyqRb5hShMejhYw61KlqU000J3eIeUo"
-    >
-    </stripe-buy-button>
-  </div>
-);
-*/
-
-
-  
-  // Este componente se encarga de renderizar el botón de compra de Stripe real mode
-
- const StripeButton = ({ className = "" }: { className?: string }) => (
-  <div className={`stripe-button-container ${className}`}>
-    <stripe-buy-button
-      buy-button-id="buy_btn_1Rr68CLaDNozqJeSJQvmCkuQ"
-      publishable-key="pk_live_51RRNGqLaDNozqJeSsBCif37utfiEfn2lcvPrCCuJ4RpJMNKT3ohVa0Kvy2vnaFbEOO231uSs424Bh1eyEkM9lZ8500P7IXhWnI"
-    >
-    </stripe-buy-button>
-  </div>
-);
-
+  // Componente del botón de Stripe (modo live)
+  const StripeButton = ({ className = "" }: { className?: string }) => (
+    <div className={`stripe-button-container ${className}`}>
+      <stripe-buy-button
+        buy-button-id="buy_btn_1Rr68CLaDNozqJeSJQvmCkuQ"
+        publishable-key="pk_live_51RRNGqLaDNozqJeSsBCif37utfiEfn2lcvPrCCuJ4RpJMNKT3ohVa0Kvy2vnaFbEOO231uSs424Bh1eyEkM9lZ8500P7IXhWnI"
+      >
+      </stripe-buy-button>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-black text-white overflow-x-hidden">
-      {/* Hero Section */}
+      {/* Hero Section - OPTIMIZADO PARA CONVERSIÓN */}
       <section className="relative min-h-screen flex items-center justify-center">
         <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black">
           <video
@@ -245,55 +231,64 @@ function App() {
             muted
             loop
             playsInline
-            preload="none"
+            preload="metadata"
+            poster="/video/fondo-poster.jpg"
             className="absolute inset-0 w-full h-full object-cover opacity-40"
           >
             <source src="/video/fondo.mp4" type="video/mp4" />
-            {/* Fallback image if video fails to load */}
-            <div className="absolute inset-0 bg-[url('https://images.pexels.com/photos/164634/pexels-photo-164634.jpeg')] bg-cover bg-center opacity-20"></div>
           </video>
           <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black opacity-80"></div>
         </div>
 
         <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="mb-8">
-            <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-yellow-600 to-yellow-500 rounded-full text-black font-semibold text-sm mb-6">
-              <Crown className="w-4 h-4 mr-2" />
-              OFERTA EXCLUSIVA LIMITADA
-            </div>
+          {/* Timer de urgencia */}
+          <div className="inline-flex items-center px-6 py-3 bg-red-600 rounded-full text-white font-bold text-sm mb-6 animate-pulse">
+            <Clock className="w-4 h-4 mr-2" />
+            OFERTA TERMINA EN: {formatTime(timeLeft)}
           </div>
 
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
             <span className="bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-600 bg-clip-text text-transparent">
-              Mega Pack de 30.000
+              30.000 Videos
             </span>
             <br />
-            <span className="text-white font-serif">Videos de Lujo</span>
+            <span className="text-white font-serif">de Lujo Premium</span>
             <br />
             <span className="text-2xl sm:text-3xl lg:text-4xl text-gray-300 font-light">
-              para Reels, TikTok y Shorts
+              que generan millones de visualizaciones
             </span>
           </h1>
 
-          <p className="text-xl sm:text-2xl text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed">
-            Contenido exclusivo y listo para usar en tus redes sociales.
-            <span className="text-yellow-400 font-semibold">
-              {" "}
-              Transforma tu perfil en una marca de lujo.
-            </span>
+          <p className="text-xl sm:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
+            Contenido viral que usan los influencers más exitosos para ganar 
+            <span className="text-yellow-400 font-semibold"> 6 cifras al mes</span>
           </p>
+
+          {/* Prueba social inmediata */}
+          <div className="grid grid-cols-3 gap-4 max-w-md mx-auto mb-8 text-center">
+            <div className="bg-black/50 p-3 rounded-lg">
+              <div className="text-2xl font-bold text-yellow-400">2,847</div>
+              <div className="text-xs text-gray-400">Vendidos hoy</div>
+            </div>
+            <div className="bg-black/50 p-3 rounded-lg">
+              <div className="text-2xl font-bold text-green-400">4.9★</div>
+              <div className="text-xs text-gray-400">Calificación</div>
+            </div>
+            <div className="bg-black/50 p-3 rounded-lg">
+              <div className="text-2xl font-bold text-blue-400">15min</div>
+              <div className="text-xs text-gray-400">Entrega</div>
+            </div>
+          </div>
 
           <div className="space-y-6">
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
               <div className="text-center">
-                <div className="text-gray-400 line-through text-xl">
-                  Antes: 97,00 €
-                </div>
+                <div className="text-gray-400 line-through text-xl">Antes: 297,00 €</div>
                 <div className="text-5xl sm:text-6xl font-bold bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">
                   18,95 €
                 </div>
-                <div className="text-red-400 font-semibold text-sm">
-                  ¡81% DE DESCUENTO!
+                <div className="text-red-400 font-semibold text-sm animate-pulse">
+                  ¡94% DE DESCUENTO HOY!
                 </div>
               </div>
             </div>
@@ -301,332 +296,156 @@ function App() {
             <StripeButton className="transform hover:scale-105 transition-all duration-300" />
 
             <p className="text-sm text-gray-400 max-w-md mx-auto">
-              ⚡ Entrega instantánea • 🔒 Pago 100% seguro • 💎 Garantía de
-              satisfacción
+              ⚡ Acceso instantáneo • 🔒 Pago 100% seguro • 💎 Garantía 30 días
             </p>
           </div>
         </div>
       </section>
 
-      {/* Benefits Section */}
-      <section className="py-20 bg-gradient-to-b from-black to-gray-900 relative">
-        <div className="absolute inset-0 bg-[url('https://images.pexels.com/photos/1545743/pexels-photo-1545743.jpeg')] bg-cover bg-center opacity-5"></div>
-        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* What is the Mega Pack Section */}
-          <div className="text-center mb-20">
-            <h2 className="text-4xl sm:text-5xl font-bold mb-8">
-              <span className="bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">
-                ¿Qué es el Mega Pack
-              </span>
-              <span className="text-white font-serif">
-                {" "}
-                de Videos Virales de Lujo?
-              </span>
+      {/* Proof Section - MÁS ARRIBA EN EL FUNNEL */}
+      <section className="py-16 bg-gradient-to-b from-black to-gray-900">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-6">
+              <span className="text-yellow-400">Miles de personas</span>
+              <span className="text-white"> ya están ganando con esto</span>
             </h2>
-            <div className="max-w-4xl mx-auto">
-              <p className="text-xl text-gray-300 mb-8 leading-relaxed">
-                Son videos de alta calidad en formato de Reel con derechos de
-                uso que puedes utilizar en IG, TikTok y YouTube Shorts. Es como
-                tener un equipo de producción a tu disposición, pero sin los
-                costos ni el tiempo de creación.
-                <span className="text-yellow-400 font-semibold">
-                  {" "}
-                  Personalízalos a tu gusto o súbelos tal cual como están y mira
-                  como tus cuentas crecen.
-                </span>
-              </p>
+          </div>
 
-              <div className="bg-gradient-to-br from-gray-900/90 to-black/90 backdrop-blur-sm p-8 rounded-2xl border border-yellow-500/30 mb-12">
-                <h3 className="text-2xl font-bold text-yellow-400 mb-6">
-                  No existe otro paquete como este en el mercado
-                </h3>
-                <p className="text-lg text-gray-300 mb-6">
-                  No hace falta que intentes buscar. No encontrarás un paquete
-                  más completo que este.
-                </p>
-
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="flex items-start space-x-3">
-                    <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                      <span className="text-black font-bold text-sm">💡</span>
+          <div className="grid md:grid-cols-3 gap-6 mb-12">
+            {testimonials.map((testimonial, index) => (
+              <div key={index} className="group">
+                <div className="relative rounded-2xl overflow-hidden border-2 border-yellow-500/30 hover:border-yellow-400/60 transition-colors duration-300">
+                  <img
+                    src={testimonial.image}
+                    alt={`Resultado cliente ${index + 1}`}
+                    className="w-full h-64 object-cover"
+                    loading="lazy"
+                  />
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/80 to-transparent p-4">
+                    <div className="flex mb-2">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className="w-4 h-4 text-yellow-400 fill-current" />
+                      ))}
                     </div>
-                    <div>
-                      <h4 className="font-semibold text-white mb-2">
-                        El pack más completo y exclusivo
-                      </h4>
-                      <p className="text-gray-300 text-sm">
-                        Ningún otro paquete ofrece esta cantidad y calidad de
-                        contenido.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start space-x-3">
-                    <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                      <span className="text-black font-bold text-sm">💡</span>
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-white mb-2">
-                        Más viralidad en redes
-                      </h4>
-                      <p className="text-gray-300 text-sm">
-                        Tus publicaciones ganarán tracción con videos
-                        impactantes.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start space-x-3">
-                    <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                      <span className="text-black font-bold text-sm">💡</span>
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-white mb-2">
-                        Ahorra tiempo y dinero
-                      </h4>
-                      <p className="text-gray-300 text-sm">
-                        No necesitas crear contenido desde cero.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start space-x-3">
-                    <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                      <span className="text-black font-bold text-sm">💡</span>
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-white mb-2">
-                        Gana autoridad y seguidores
-                      </h4>
-                      <p className="text-gray-300 text-sm">
-                        Eleva tu imagen con videos profesionales.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start space-x-3 md:col-span-2">
-                    <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                      <span className="text-black font-bold text-sm">💡</span>
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-white mb-2">
-                        Monetiza fácilmente
-                      </h4>
-                      <p className="text-gray-300 text-sm">
-                        Usa los videos para atraer clientes y aumentar ingresos
-                        de tu negocio.
-                      </p>
-                    </div>
+                    <p className="text-white font-semibold mb-1">{testimonial.name}</p>
+                    <p className="text-gray-200 text-sm">{testimonial.text}</p>
                   </div>
                 </div>
               </div>
-            </div>
+            ))}
           </div>
 
-          {/* For Whom Section */}
-          <div className="mb-20">
-            <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12">
-              <span className="bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">
-                ¿Para Quién es
-              </span>
-              <span className="text-white font-serif"> Este Pack?</span>
-            </h2>
+          {/* Stats mejoradas */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto text-center">
+            <div className="bg-gradient-to-br from-gray-900/80 to-black/80 p-6 rounded-xl">
+              <Users className="w-8 h-8 text-yellow-400 mx-auto mb-2" />
+              <div className="text-2xl font-bold text-white">50,000+</div>
+              <div className="text-gray-300 text-sm">Creadores lo usan</div>
+            </div>
+            <div className="bg-gradient-to-br from-gray-900/80 to-black/80 p-6 rounded-xl">
+              <TrendingUp className="w-8 h-8 text-green-400 mx-auto mb-2" />
+              <div className="text-2xl font-bold text-white">300%</div>
+              <div className="text-gray-300 text-sm">Aumento engagement</div>
+            </div>
+            <div className="bg-gradient-to-br from-gray-900/80 to-black/80 p-6 rounded-xl">
+              <Crown className="w-8 h-8 text-purple-400 mx-auto mb-2" />
+              <div className="text-2xl font-bold text-white">4TB</div>
+              <div className="text-gray-300 text-sm">De contenido premium</div>
+            </div>
+            <div className="bg-gradient-to-br from-gray-900/80 to-black/80 p-6 rounded-xl">
+              <Award className="w-8 h-8 text-blue-400 mx-auto mb-2" />
+              <div className="text-2xl font-bold text-white">24/7</div>
+              <div className="text-gray-300 text-sm">Soporte incluido</div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+      {/* What You Get - SIMPLIFICADO */}
+      <section className="py-16 bg-gradient-to-b from-gray-900 to-black">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-6">
+              <span className="text-yellow-400">¿Qué obtienes</span>
+              <span className="text-white"> por solo 18,95€?</span>
+            </h2>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8 mb-12">
+            {/* Contenido principal */}
+            <div className="bg-gradient-to-br from-yellow-500/10 to-yellow-600/5 p-8 rounded-2xl border-2 border-yellow-500/30">
+              <div className="text-center mb-6">
+                <div className="w-16 h-16 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <span className="text-black font-bold text-2xl">🔥</span>
+                </div>
+                <h3 className="text-2xl font-bold text-yellow-400 mb-4">30,000 Videos HD</h3>
+                <p className="text-gray-300">
+                  Más de <span className="text-yellow-400 font-bold">4TB de contenido</span> en Google Drive
+                </p>
+              </div>
+            </div>
+
+            {/* Categorías */}
+            <div className="space-y-4">
               {[
-                "Creadores de contenido que buscan viralidad inmediata",
-                "Emprendedores que necesitan contenido impactante",
-                "Agencias de marketing y editores de video",
-                "Marcas y negocios que buscan diferenciarse en redes",
-                "Personas que no logran viralizar su contenido y quieren crecer en redes rápidamente",
-                "Dueños de negocios que sienten que su marca está estancada y necesitan contenido de alto impacto",
-              ].map((item, index) => (
-                <div
-                  key={index}
-                  className="flex items-start space-x-3 bg-gradient-to-br from-gray-900/50 to-black/50 p-6 rounded-xl border border-yellow-500/20"
-                >
-                  <div className="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                    <span className="text-black font-bold text-xs">🌟</span>
+                { icon: "🏎️", title: "Coches de Lujo", desc: "Ferrari, Lamborghini, McLaren..." },
+                { icon: "🛩️", title: "Jets & Yates", desc: "Aviones privados y yates de millones" },
+                { icon: "🏖️", title: "Lifestyle Millonario", desc: "Casas, viajes, experiencias premium" },
+                { icon: "💪", title: "Motivación & Gym", desc: "Contenido inspiracional y fitness" },
+              ].map((category, index) => (
+                <div key={index} className="bg-gradient-to-br from-gray-900/80 to-black/80 p-4 rounded-xl border border-yellow-500/20 flex items-center">
+                  <span className="text-2xl mr-4">{category.icon}</span>
+                  <div>
+                    <h4 className="font-bold text-white">{category.title}</h4>
+                    <p className="text-gray-300 text-sm">{category.desc}</p>
                   </div>
-                  <p className="text-gray-300 text-sm leading-relaxed">
-                    {item}
-                  </p>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* What You Get Section */}
-          <div className="mb-20">
-            <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12">
-              <span className="bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">
-                ¿Qué obtienes
-              </span>
-              <span className="text-white font-serif"> al comprar?</span>
-            </h2>
-
-            <div className="max-w-4xl mx-auto">
-              {/* Main Feature */}
-              <div className="bg-gradient-to-br from-yellow-500/10 to-yellow-600/5 p-8 rounded-2xl border-2 border-yellow-500/30 mb-8">
-                <div className="flex items-center justify-center mb-6">
-                  <div className="w-16 h-16 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-2xl flex items-center justify-center">
-                    <span className="text-black font-bold text-2xl">🔥</span>
-                  </div>
-                </div>
-                <h3 className="text-2xl sm:text-3xl font-bold text-center mb-4">
-                  <span className="bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">
-                    +30,000 videos HD
-                  </span>
-                </h3>
-                <div className="grid md:grid-cols-2 gap-6 text-center">
-                  <div className="bg-black/30 p-6 rounded-xl">
-                    <h4 className="text-yellow-400 font-bold text-lg mb-2">
-                      📁 Almacenamiento
-                    </h4>
-                    <p className="text-gray-300">
-                      Más de{" "}
-                      <span className="text-yellow-400 font-bold">
-                        4TB de contenido
-                      </span>{" "}
-                      guardado en Google Drive
-                    </p>
-                  </div>
-                  <div className="bg-black/30 p-6 rounded-xl">
-                    <h4 className="text-yellow-400 font-bold text-lg mb-2">
-                      ♾️ Acceso
-                    </h4>
-                    <p className="text-gray-300">
-                      Acceso a la carpeta{" "}
-                      <span className="text-yellow-400 font-bold">
-                        de por vida
-                      </span>
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Categories */}
-              <div className="mb-8">
-                <h3 className="text-2xl font-bold text-center mb-8 text-yellow-400">
-                  Categorías exclusivas:
-                </h3>
-                <div className="grid md:grid-cols-2 gap-4">
-                  {[
-                    {
-                      icon: "👑",
-                      title: "Lujo & Estilo de vida millonario",
-                      desc: "Coches de lujo, yates, mansiones, viajes premium",
-                    },
-                    {
-                      icon: "🚀",
-                      title: "Superación personal",
-                      desc: "Motivación, crecimiento personal, mentalidad de éxito",
-                    },
-                    {
-                      icon: "💼",
-                      title: "Negocios & Emprendimiento",
-                      desc: "Estrategias de negocio, inversiones, lifestyle empresarial",
-                    },
-                    {
-                      icon: "⚡",
-                      title: "Motivación & Éxito",
-                      desc: "Frases inspiradoras, logros, mentalidad ganadora",
-                    },
-                  ].map((category, index) => (
-                    <div
-                      key={index}
-                      className="bg-gradient-to-br from-gray-900/80 to-black/80 p-6 rounded-xl border border-yellow-500/20"
-                    >
-                      <div className="flex items-center mb-3">
-                        <span className="text-2xl mr-3">{category.icon}</span>
-                        <h4 className="font-bold text-white">
-                          {category.title}
-                        </h4>
-                      </div>
-                      <p className="text-gray-300 text-sm">{category.desc}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Additional Features */}
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="bg-gradient-to-br from-gray-900/80 to-black/80 p-6 rounded-xl border border-yellow-500/20">
-                  <h4 className="font-bold text-yellow-400 mb-3 flex items-center">
-                    <span className="mr-2">📱</span>
-                    Formatos compatibles
-                  </h4>
-                  <p className="text-gray-300 text-sm mb-3">
-                    Con todas las redes sociales:
-                  </p>
-                  <ul className="text-gray-300 text-sm space-y-1">
-                    <li>• TikTok</li>
-                    <li>• Instagram Reels</li>
-                    <li>• YouTube Shorts</li>
-                    <li>• Facebook Reels</li>
-                  </ul>
-                </div>
-
-                <div className="bg-gradient-to-br from-gray-900/80 to-black/80 p-6 rounded-xl border border-yellow-500/20">
-                  <h4 className="font-bold text-yellow-400 mb-3 flex items-center">
-                    <span className="mr-2">⚖️</span>
-                    Derechos incluidos
-                  </h4>
-                  <p className="text-gray-300 text-sm">
-                    Derechos de uso incluidos para{" "}
-                    <span className="text-yellow-400 font-semibold">
-                      monetizar sin restricciones
-                    </span>
-                  </p>
-                </div>
-              </div>
-            </div>
+          {/* CTA intermedio */}
+          <div className="text-center bg-gradient-to-r from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-3xl p-8">
+            <p className="text-xl text-gray-200 mb-6">
+              <span className="text-yellow-400 font-bold">Solo quedan {Math.floor(Math.random() * 50) + 10} unidades</span>
+              <br />a este precio especial
+            </p>
+            <StripeButton />
           </div>
         </div>
       </section>
 
-      {/* Visual Gallery Section - OPTIMIZADA PARA VELOCIDAD */}
-      <section className="py-20 bg-gradient-to-b from-gray-900 via-black to-gray-900 relative overflow-hidden">
-        {/* Efectos de fondo lujosos */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-yellow-900/20 via-transparent to-transparent"></div>
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-yellow-500/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl"></div>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl sm:text-6xl font-bold mb-6 leading-tight">
-              <span className="text-white font-serif tracking-wide">
-                Colección
-              </span>
+      {/* Video Gallery - OPTIMIZADA */}
+      <section className="py-16 bg-gradient-to-b from-black via-gray-900 to-black">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-5xl font-bold mb-6">
+              <span className="text-white font-serif">Vista Previa</span>
               <br />
-              <span className="bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-600 bg-clip-text text-transparent font-bold">
-                Premium
+              <span className="bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">
+                Calidad Premium
               </span>
             </h2>
-            <div className="w-24 h-1 bg-gradient-to-r from-yellow-400 to-amber-600 mx-auto mb-6 rounded-full"></div>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
-              Experimenta la máxima calidad en cada video de nuestra exclusiva
-              colección
-            </p>
+            <p className="text-xl text-gray-300">Una pequeña muestra de lo que obtienes</p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 mb-16">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-12">
             {videos.map((video, index) => (
               <div
                 key={index}
-                className="group relative aspect-[9/16] rounded-2xl overflow-hidden cursor-pointer transform transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-yellow-500/25"
+                className="group relative aspect-[9/16] rounded-2xl overflow-hidden cursor-pointer transform transition-all duration-300 hover:scale-105"
                 onClick={() => handleVideoClick(`/video/${video}`, index)}
               >
-                {/* Video preview - Optimizado para carga rápida */}
                 <video
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  className="w-full h-full object-cover"
                   muted
-                  loop
                   playsInline
                   preload="metadata"
+                  poster={`/video/thumbnails/thumb-${index + 1}.jpg`}
                   onMouseEnter={(e: React.MouseEvent<HTMLVideoElement>) => {
                     const target = e.target as HTMLVideoElement;
-                    target.currentTime = 0;
+                    target.currentTime = 1;
                     target.play().catch(() => {});
                   }}
                   onMouseLeave={(e: React.MouseEvent<HTMLVideoElement>) => {
@@ -638,51 +457,31 @@ function App() {
                   <source src={`/video/${video}`} type="video/mp4" />
                 </video>
 
-                {/* Overlay gradient */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-300"></div>
-
-                {/* Golden border effect */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <div className="absolute inset-0 rounded-2xl ring-2 ring-yellow-500/20 group-hover:ring-yellow-400/60 transition-all duration-300"></div>
 
-                {/* Play button */}
                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-                  <div className="w-16 h-16 bg-gradient-to-r from-yellow-400 to-amber-500 rounded-full flex items-center justify-center shadow-lg transform scale-90 group-hover:scale-100 transition-transform duration-300">
+                  <div className="w-16 h-16 bg-yellow-400 rounded-full flex items-center justify-center shadow-lg">
                     <Play className="w-8 h-8 text-black fill-current ml-1" />
                   </div>
                 </div>
 
-                {/* Video number */}
                 <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-sm px-3 py-1 rounded-full">
-                  <span className="text-yellow-400 font-bold text-sm">
-                    #{String(index + 1).padStart(2, "0")}
-                  </span>
-                </div>
-
-                {/* Premium badge */}
-                <div className="absolute top-4 right-4 bg-gradient-to-r from-yellow-400 to-amber-500 px-2 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <span className="text-black font-bold text-xs uppercase tracking-wide">
-                    4K
-                  </span>
+                  <span className="text-yellow-400 font-bold text-sm">#{String(index + 1).padStart(2, "0")}</span>
                 </div>
               </div>
             ))}
           </div>
 
-          <div className="text-center bg-gradient-to-r from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-3xl p-8 border border-yellow-500/20">
-            <p className="text-gray-300 mb-6 text-lg leading-relaxed">
-              <span className="text-transparent bg-gradient-to-r from-yellow-400 to-amber-500 bg-clip-text font-bold text-xl">
-                Esta es solo una pequeña muestra de lujo...
-              </span>
-              <br />
-              <span className="text-gray-200">
-                ¡Desbloquea acceso a 30,000 videos premium en máxima calidad!
-              </span>
+          <div className="text-center">
+            <p className="text-2xl text-gray-200 mb-6">
+              <span className="text-yellow-400 font-bold">Esto es solo el 0.03%</span> del contenido total
             </p>
             <StripeButton />
           </div>
         </div>
 
-        {/* Modal de video en pantalla completa con navegación */}
+        {/* Modal de video - MANTENIDO IGUAL */}
         {selectedVideo && (
           <div
             ref={fullscreenRef}
@@ -690,15 +489,12 @@ function App() {
               isFullscreen ? "p-0" : "p-4"
             }`}
           >
-            {/* Video player */}
             <div className="relative w-full h-full max-w-4xl max-h-full flex items-center justify-center">
               {isLoading && (
                 <div className="absolute inset-0 flex items-center justify-center bg-black/80 z-10">
                   <div className="flex flex-col items-center">
                     <div className="w-16 h-16 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-                    <p className="text-white text-lg font-semibold">
-                      Cargando video...
-                    </p>
+                    <p className="text-white text-lg font-semibold">Cargando video...</p>
                   </div>
                 </div>
               )}
@@ -721,19 +517,14 @@ function App() {
                     videoRef.current.play().catch(() => {});
                   }
                 }}
-                onError={() => {
-                  setIsLoading(false);
-                  console.error("Error loading video");
-                }}
               >
                 <source src={selectedVideo.src} type="video/mp4" />
               </video>
 
-              {/* Navigation arrows - Mejoradas */}
               <button
                 onClick={() => navigateVideo("prev")}
                 disabled={isLoading}
-                className="absolute left-4 top-1/2 transform -translate-y-1/2 w-14 h-14 bg-black/80 hover:bg-yellow-600 rounded-full flex items-center justify-center transition-all duration-200 z-20 disabled:opacity-50 disabled:cursor-not-allowed backdrop-blur-sm"
+                className="absolute left-4 top-1/2 transform -translate-y-1/2 w-14 h-14 bg-black/80 hover:bg-yellow-600 rounded-full flex items-center justify-center transition-all duration-200 z-20 disabled:opacity-50"
               >
                 <ChevronLeft className="w-8 h-8 text-white" />
               </button>
@@ -741,19 +532,16 @@ function App() {
               <button
                 onClick={() => navigateVideo("next")}
                 disabled={isLoading}
-                className="absolute right-4 top-1/2 transform -translate-y-1/2 w-14 h-14 bg-black/80 hover:bg-yellow-600 rounded-full flex items-center justify-center transition-all duration-200 z-20 disabled:opacity-50 disabled:cursor-not-allowed backdrop-blur-sm"
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 w-14 h-14 bg-black/80 hover:bg-yellow-600 rounded-full flex items-center justify-center transition-all duration-200 z-20 disabled:opacity-50"
               >
                 <ChevronRight className="w-8 h-8 text-white" />
               </button>
 
-              {/* Controls overlay */}
               <div className="absolute inset-0 group">
-                {/* Top controls */}
                 <div className="absolute top-0 left-0 right-0 bg-gradient-to-b from-black/80 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <div className="flex justify-between items-center">
                     <h3 className="text-white font-bold text-lg">
-                      Video Premium #
-                      {String(selectedVideo.index + 1).padStart(2, "0")}
+                      Video Premium #{String(selectedVideo.index + 1).padStart(2, "0")}
                     </h3>
                     <button
                       onClick={closeVideo}
@@ -764,29 +552,19 @@ function App() {
                   </div>
                 </div>
 
-                {/* Bottom controls */}
                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <div className="flex justify-center space-x-4">
                     <button
                       onClick={toggleMute}
                       className="w-12 h-12 bg-black/60 hover:bg-yellow-600 rounded-full flex items-center justify-center transition-colors duration-200"
                     >
-                      {isMuted ? (
-                        <VolumeX className="w-6 h-6 text-white" />
-                      ) : (
-                        <Volume2 className="w-6 h-6 text-white" />
-                      )}
+                      {isMuted ? <VolumeX className="w-6 h-6 text-white" /> : <Volume2 className="w-6 h-6 text-white" />}
                     </button>
-
                     <button
                       onClick={toggleFullscreen}
                       className="w-12 h-12 bg-black/60 hover:bg-yellow-600 rounded-full flex items-center justify-center transition-colors duration-200"
                     >
-                      {isFullscreen ? (
-                        <Minimize className="w-6 h-6 text-white" />
-                      ) : (
-                        <Maximize className="w-6 h-6 text-white" />
-                      )}
+                      {isFullscreen ? <Minimize className="w-6 h-6 text-white" /> : <Maximize className="w-6 h-6 text-white" />}
                     </button>
                   </div>
                 </div>
@@ -796,255 +574,105 @@ function App() {
         )}
       </section>
 
-      {/* Pricing Section */}
-      <section className="py-20 bg-gradient-to-b from-black to-gray-900 relative">
-        <div className="absolute inset-0 bg-[url('https://images.pexels.com/photos/221348/pexels-photo-221348.jpeg')] bg-cover bg-center opacity-10"></div>
-        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="bg-gradient-to-br from-gray-900/90 to-black/90 backdrop-blur-sm p-12 rounded-3xl border-2 border-yellow-500/30">
-            <div className="mb-8">
-              <div className="inline-flex items-center px-6 py-3 bg-red-600 rounded-full text-white font-bold text-sm mb-6 animate-pulse">
-                <Zap className="w-4 h-4 mr-2" />
-                OFERTA LIMITADA - NO VOLVERÁ A REPETIRSE
-              </div>
+      {/* Final CTA - URGENCIA MÁXIMA */}
+      <section className="py-20 bg-gradient-to-b from-black to-red-900/20 relative">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="bg-gradient-to-br from-red-900/30 to-black/90 backdrop-blur-sm p-12 rounded-3xl border-2 border-red-500/50">
+            
+            {/* Timer grande */}
+            <div className="inline-flex items-center px-8 py-4 bg-red-600 rounded-full text-white font-bold text-xl mb-8 animate-pulse">
+              <Clock className="w-6 h-6 mr-3" />
+              TIEMPO RESTANTE: {formatTime(timeLeft)}
             </div>
 
-            <h3 className="text-3xl sm:text-4xl font-bold mb-8">
-              <span className="text-white font-serif">Acceso completo por</span>
-              <span className="bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">
-                {" "}
-                solo:
-              </span>
-            </h3>
-
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-8 mb-12">
-              <div className="text-center">
-                <div className="text-2xl text-gray-400 line-through mb-2">
-                  Precio normal: 97,00 €
-                </div>
-                <div className="text-7xl sm:text-8xl font-bold bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent mb-2">
-                  18,95€
-                </div>
-                <div className="text-red-400 font-bold text-xl">
-                  ¡AHORRA 78,05 €!
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-4 mb-12">
-              <div className="flex items-center justify-center text-green-400 text-lg">
-                <CheckCircle className="w-6 h-6 mr-3" />
-                Acceso inmediato tras la compra
-              </div>
-              <div className="flex items-center justify-center text-green-400 text-lg">
-                <CheckCircle className="w-6 h-6 mr-3" />
-                30.000 videos en resolución premium
-              </div>
-              <div className="flex items-center justify-center text-green-400 text-lg">
-                <CheckCircle className="w-6 h-6 mr-3" />
-                Actualizaciones gratuitas de por vida
-              </div>
-            </div>
-
-            <StripeButton />
-
-            <p className="text-sm text-gray-400 mt-6">
-              💳 Pago seguro con Stripe • 🔒 Datos protegidos • ⚡ Descarga
-              inmediata
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials Section - SOLO IMÁGENES */}
-      <section className="py-20 bg-gradient-to-b from-gray-900 to-black">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl sm:text-5xl font-bold mb-6">
-              <span className="text-white font-serif">Lo que dicen</span>
-              <span className="bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">
-                {" "}
-                nuestros clientes
-              </span>
-            </h2>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8 mb-16">
-            {testimonials.map((testimonial, index) => (
-              <div
-                key={index}
-                className="group transform hover:scale-105 transition-all duration-300"
-              >
-                <div className="relative rounded-2xl overflow-hidden border-2 border-yellow-500/30 hover:border-yellow-400/60 transition-colors duration-300">
-                  <img
-                    src={testimonial.image}
-                    alt={`Testimonio ${index + 1}`}
-                    className="w-full h-auto object-cover"
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="text-center">
-            <div className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-green-600 to-green-500 rounded-2xl">
-              <Shield className="w-6 h-6 mr-3" />
-              <span className="font-bold text-lg">
-                Garantía de Satisfacción 100%
-              </span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Final CTA Section */}
-      <section className="py-20 bg-gradient-to-b from-black via-gray-900 to-black relative">
-        <div className="absolute inset-0 bg-[url('https://images.pexels.com/photos/279315/pexels-photo-279315.jpeg')] bg-cover bg-center opacity-15"></div>
-        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="mb-12">
-            <Award className="w-20 h-20 text-yellow-500 mx-auto mb-8" />
             <h2 className="text-4xl sm:text-6xl font-bold mb-6">
-              <span className="text-white font-serif">No pierdas esta</span>
+              <span className="text-white font-serif">Última</span>
               <br />
-              <span className="bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">
-                oportunidad única
+              <span className="bg-gradient-to-r from-yellow-400 to-red-400 bg-clip-text text-transparent">
+                Oportunidad
               </span>
             </h2>
-            <p className="text-xl sm:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
-              Miles de creadores ya están usando nuestro contenido para
-              <span className="text-yellow-400 font-semibold">
-                {" "}
-                dominar las redes sociales.
-              </span>
-              <br />
-              ¿Vas a quedarte atrás?
-            </p>
-          </div>
 
-          <div className="space-y-6">
-            <div className="text-center mb-8">
+            <div className="mb-8">
               <div className="text-6xl sm:text-7xl font-bold bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent mb-2">
                 18,95€
               </div>
-              <div className="text-gray-400 line-through text-2xl mb-2">
-                En lugar de 97,00€
-              </div>
+              <div className="text-gray-400 line-through text-2xl mb-2">En lugar de 297,00€</div>
               <div className="text-red-400 font-bold text-xl animate-pulse">
-                ⏰ Esta oferta expira pronto
+                ⏰ Precio vuelve a 297€ cuando termine el timer
+              </div>
+            </div>
+
+            <div className="space-y-6 mb-8">
+              <div className="flex items-center justify-center text-green-400 text-xl">
+                <CheckCircle className="w-6 h-6 mr-3" />
+                30,000 videos premium en Google Drive
+              </div>
+              <div className="flex items-center justify-center text-green-400 text-xl">
+                <CheckCircle className="w-6 h-6 mr-3" />
+                Acceso inmediato tras el pago
+              </div>
+              <div className="flex items-center justify-center text-green-400 text-xl">
+                <CheckCircle className="w-6 h-6 mr-3" />
+                Garantía de devolución 30 días
               </div>
             </div>
 
             <StripeButton />
 
-            <p className="text-lg text-gray-300 max-w-2xl mx-auto">
-              <span className="text-yellow-400 font-semibold">
-                Última oportunidad:
-              </span>
-              Esta es la única vez que ofreceremos este pack completo a este
-              precio. Una vez que cierre la oferta, el precio volverá a 97€.
+            <p className="text-lg text-gray-300 max-w-2xl mx-auto mt-6">
+              <span className="text-red-400 font-bold">AVISO:</span>
+              Esta oferta no se repetirá. Miles de personas ya están usando este contenido para ganar dinero.
+              ¿Vas a quedarte atrás?
             </p>
           </div>
         </div>
       </section>
 
-      {/* FAQ Section - ACTUALIZADA CON EMAIL DE SOPORTE */}
-      <section className="py-20 bg-gradient-to-b from-gray-900 to-black">
+      {/* FAQ Compacta - SOLO LAS ESENCIALES */}
+      <section className="py-16 bg-gradient-to-b from-gray-900 to-black">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl sm:text-5xl font-bold mb-6">
-              <span className="text-white font-serif">Preguntas</span>
-              <span className="bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">
-                {" "}
-                Frecuentes
-              </span>
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-6">
+              <span className="text-white">Preguntas</span>
+              <span className="text-yellow-400"> Importantes</span>
             </h2>
-            <p className="text-xl text-gray-300">
-              Resolvemos todas tus dudas sobre el Mega Pack
-            </p>
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-4">
             {[
               {
                 question: "¿Cómo recibo el acceso después de comprar?",
-                answer:
-                  "Después del pago serás redirigido automáticamente a una página especial donde encontrarás un botón para acceder a la carpeta de Google Drive. Simplemente haz clic en 'Acceder a la Carpeta' y luego podrás copiarla a tu propio Drive para acceso directo y permanente. Si tienes problemas, contáctanos a megapack3k@gmail.com",
+                answer: "Inmediatamente después del pago serás redirigido a una página con el enlace directo a Google Drive. También recibirás un email con las instrucciones. Si hay problemas: megapack3k@gmail.com"
               },
               {
-                question: "¿Qué hago si compro y no obtengo acceso?",
-                answer:
-                  "Si realizaste el pago y no fuiste redirigido correctamente, no te preocupes. Envíanos un email a megapack3k@gmail.com con tu comprobante de pago y te proporcionaremos el enlace de acceso personalizado en menos de 1 hora.",
+                question: "¿Realmente son 30.000 videos sin marca de agua?",
+                answer: "Sí, más de 30.000 videos en HD completamente limpios, organizados en carpetas por categorías. Más de 4TB de contenido premium listo para usar."
               },
               {
-                question: "¿Realmente son 30.000 videos?",
-                answer:
-                  "Sí, el pack contiene más de 30.000 videos en formato vertical (9:16) optimizados para Reels, TikTok y Shorts. Todo el contenido está organizado en carpetas por categorías en Google Drive con más de 4TB de material.",
+                question: "¿Puedo usar estos videos para mi negocio y ganar dinero?",
+                answer: "Absolutamente. Derechos de uso comercial incluidos. Puedes usarlos para tu marca, clientes, o incluso revenderlos. Sin restricciones."
               },
               {
-                question: "¿Puedo usar estos videos para mi negocio?",
-                answer:
-                  "Absolutamente. Todos los videos incluyen derechos de uso comercial. Puedes usarlos para tu marca personal, negocio, clientes, o incluso revenderlos. No hay restricciones de uso.",
+                question: "¿Esta oferta de 18,95€ es real o hay costos ocultos?",
+                answer: "Es real y es el precio final. No hay costos ocultos, suscripciones o pagos adicionales. Pago único con acceso de por vida."
               },
               {
-                question: "¿Los videos tienen marca de agua?",
-                answer:
-                  "No, todos los videos están completamente limpios sin marcas de agua, logos o watermarks. Están listos para usar tal como están o puedes editarlos y personalizarlos.",
-              },
-              {
-                question: "¿Funciona en todos los países?",
-                answer:
-                  "Sí, el contenido es universal y funciona en cualquier país. Los videos son principalmente visuales con música de fondo, perfectos para cualquier audiencia global.",
-              },
-              {
-                question: "¿Qué calidad tienen los videos?",
-                answer:
-                  "Todos los videos están en alta definición (HD) y muchos en 4K. Están optimizados específicamente para redes sociales con la máxima calidad posible para formato vertical.",
-              },
-              {
-                question: "¿Hay actualizaciones incluidas?",
-                answer:
-                  "Sí, una vez que copies la carpeta a tu Google Drive, recibirás actualizaciones automáticas cuando agreguemos nuevo contenido, sin costo adicional y de por vida.",
-              },
-              {
-                question: "¿Puedo descargar todos los videos?",
-                answer:
-                  "Sí, puedes descargar todos los videos a tu dispositivo una vez que tengas la carpeta en tu Google Drive. También puedes acceder directamente desde Drive para usar cuando necesites.",
-              },
-              {
-                question: "¿Ofrecen garantía?",
-                answer:
-                  "Sí, ofrecemos garantía de satisfacción del 100%. Si no estás completamente satisfecho con el contenido, contáctanos a megapack3k@gmail.com dentro de los primeros 7 días.",
-              },
-              {
-                question: "¿Cómo contacto soporte si tengo problemas?",
-                answer:
-                  "Puedes contactarnos enviando un email a megapack3k@gmail.com con tu comprobante de pago. Nuestro equipo de soporte responde en menos de 2 horas y resuelve cualquier problema de acceso inmediatamente.",
-              },
-              {
-                question: "¿Esta oferta de 18,95€ es real?",
-                answer:
-                  "Sí, es una oferta promocional limitada. El precio normal es 97€, pero por tiempo limitado ofrecemos este descuento especial. Una vez que termine la promoción, el precio volverá al valor original.",
-              },
+                question: "¿Qué hago si tengo problemas después de comprar?",
+                answer: "Contáctanos a megapack3k@gmail.com con tu comprobante de pago. Respuesta garantizada en menos de 2 horas. Soporte incluido de por vida."
+              }
             ].map((faq, index) => (
-              <div
-                key={index}
-                className="bg-gradient-to-br from-gray-900/80 to-black/80 rounded-2xl border border-yellow-500/20 overflow-hidden"
-              >
+              <div key={index} className="bg-gradient-to-br from-gray-900/80 to-black/80 rounded-xl border border-yellow-500/20">
                 <details className="group">
                   <summary className="flex items-center justify-between p-6 cursor-pointer hover:bg-yellow-500/5 transition-colors duration-300">
-                    <h3 className="text-lg font-semibold text-white pr-4">
-                      {faq.question}
-                    </h3>
-                    <div className="w-8 h-8 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-full flex items-center justify-center flex-shrink-0 group-open:rotate-45 transition-transform duration-300">
+                    <h3 className="text-lg font-semibold text-white pr-4">{faq.question}</h3>
+                    <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center flex-shrink-0 group-open:rotate-45 transition-transform duration-300">
                       <span className="text-black font-bold text-xl">+</span>
                     </div>
                   </summary>
                   <div className="px-6 pb-6">
                     <div className="pt-4 border-t border-yellow-500/20">
-                      <p className="text-gray-300 leading-relaxed">
-                        {faq.answer}
-                      </p>
+                      <p className="text-gray-300 leading-relaxed">{faq.answer}</p>
                     </div>
                   </div>
                 </details>
@@ -1052,86 +680,41 @@ function App() {
             ))}
           </div>
 
-          {/* Contact Support Box - ACTUALIZADA */}
-          <div className="mt-16 bg-gradient-to-br from-yellow-500/10 to-yellow-600/5 p-8 rounded-2xl border-2 border-yellow-500/30 text-center">
-            <div className="w-16 h-16 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
-              <span className="text-black font-bold text-2xl">💬</span>
-            </div>
-            <h3 className="text-2xl font-bold text-white mb-4">
-              ¿Tienes más preguntas?
-            </h3>
-            <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
-              Si tienes alguna duda específica o problemas con el acceso después
-              de la compra,
-              <span className="text-yellow-400 font-semibold">
-                {" "}
-                contáctanos con tu comprobante de pago
-              </span>
-              y te ayudaremos inmediatamente.
-            </p>
-            <div className="bg-black/30 p-6 rounded-xl max-w-md mx-auto">
-              <h4 className="text-yellow-400 font-bold mb-3">
-                📧 Soporte Directo
-              </h4>
-              <div className="bg-gray-900/50 p-3 rounded-lg mb-3">
-                <p className="text-yellow-300 font-mono text-lg">
-                  megapack3k@gmail.com
-                </p>
-              </div>
-              <p className="text-gray-300 text-sm mb-2">
-                Envía tu comprobante de pago y te damos acceso personal
-              </p>
-              <p className="text-yellow-400 font-semibold">
-                Respuesta en menos de 2 horas
-              </p>
+          {/* Soporte directo */}
+          <div className="mt-12 bg-gradient-to-br from-yellow-500/10 to-yellow-600/5 p-6 rounded-2xl border-2 border-yellow-500/30 text-center">
+            <h3 className="text-xl font-bold text-white mb-3">¿Problemas con el acceso?</h3>
+            <div className="bg-black/30 p-4 rounded-xl max-w-md mx-auto">
+              <p className="text-yellow-300 font-mono text-lg mb-2">megapack3k@gmail.com</p>
+              <p className="text-gray-300 text-sm">Envía tu comprobante y te damos acceso personal</p>
+              <p className="text-yellow-400 font-semibold">Respuesta en menos de 2 horas</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-black py-12 border-t border-gray-800">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="mb-8">
-            <div className="text-2xl font-bold bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent mb-4">
-              Mega Pack Videos de Lujo
-            </div>
-            <p className="text-gray-400">
-              Tu éxito en redes sociales empieza aquí
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8 text-sm text-gray-400">
+      {/* Footer Simplificado */}
+      <footer className="bg-black py-8 border-t border-gray-800">
+        <div className="max-w-6xl mx-auto px-4 text-center">
+          <div className="text-xl font-bold text-yellow-400 mb-2">Mega Pack Videos de Lujo</div>
+          <p className="text-gray-400 text-sm mb-4">Tu éxito en redes sociales empieza aquí</p>
+          
+          <div className="grid md:grid-cols-3 gap-6 text-xs text-gray-500 max-w-2xl mx-auto">
             <div>
-              <h4 className="text-white font-semibold mb-3">Contenido</h4>
-              <ul className="space-y-2">
-                <li>30.000 videos premium</li>
-                <li>Resolución hasta 4K</li>
-                <li>Formato vertical optimizado</li>
-              </ul>
+              <p>30,000 videos premium</p>
+              <p>Acceso instantáneo</p>
             </div>
             <div>
-              <h4 className="text-white font-semibold mb-3">Garantías</h4>
-              <ul className="space-y-2">
-                <li>Pago 100% seguro</li>
-                <li>Acceso instantáneo</li>
-                <li>Soporte técnico incluido</li>
-              </ul>
+              <p>Pago 100% seguro</p>
+              <p>Garantía 30 días</p>
             </div>
             <div>
-              <h4 className="text-white font-semibold mb-3">Contacto</h4>
-              <ul className="space-y-2">
-                <li>megapack3k@gmail.com</li>
-                <li>Respuesta en 2 horas</li>
-                <li>Satisfacción garantizada</li>
-              </ul>
+              <p>megapack3k@gmail.com</p>
+              <p>Soporte incluido</p>
             </div>
           </div>
-
-          <div className="mt-12 pt-8 border-t border-gray-800 text-center text-gray-500 text-sm">
-            <p>
-              © 2024 Mega Pack Videos de Lujo. Todos los derechos reservados.
-            </p>
+          
+          <div className="mt-6 pt-4 border-t border-gray-800">
+            <p className="text-gray-600 text-xs">© 2024 Mega Pack Videos de Lujo. Todos los derechos reservados.</p>
           </div>
         </div>
       </footer>

@@ -3,39 +3,60 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Mega Pack de 30.000 Videos de Lujo para Reels, TikTok y Shorts. Contenido premium lifestyle de coches, yates, mansiones y viajes de lujo. ¡Oferta limitada 18,95€!" />
-    <meta name="keywords" content="videos lujo, reels, tiktok, shorts, contenido premium, lifestyle, coches lujo, yates, mansiones" />
-    <meta property="og:title" content="Mega Pack 30.000 Videos de Lujo - Reels, TikTok y Shorts" />
-    <meta property="og:description" content="Transforma tu perfil en una marca de lujo con 30.000 videos premium. ¡Solo 18,95€ por tiempo limitado!" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    
+    <!-- SEO Optimizado -->
+    <meta name="description" content="🔥 30.000 Videos Premium de Lujo para Reels, TikTok y Shorts. Coches, yates, jets, lifestyle millonario. Solo 18,95€ - Oferta limitada que termina hoy." />
+    <meta name="keywords" content="videos lujo premium, reels virales, tiktok shorts, contenido millonario, lifestyle lujo, videos coches ferrari, jets privados, yates lujo" />
+    
+    <!-- Open Graph optimizado para redes sociales -->
+    <meta property="og:title" content="🔥 30.000 Videos Premium de Lujo - Solo 18,95€ HOY" />
+    <meta property="og:description" content="Contenido viral que usan influencers para ganar 6 cifras. Coches, jets, yates, lifestyle millonario. Acceso inmediato." />
     <meta property="og:type" content="website" />
+    <meta property="og:image" content="/og-image.jpg" />
+    <meta property="og:url" content="https://megapacklujo.com" />
+    
+    <!-- Twitter Cards -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Mega Pack 30.000 Videos de Lujo - Reels, TikTok y Shorts" />
-    <meta name="twitter:description" content="Transforma tu perfil en una marca de lujo con 30.000 videos premium. ¡Solo 18,95€ por tiempo limitado!" />
+    <meta name="twitter:title" content="🔥 30.000 Videos Premium de Lujo - Solo 18,95€" />
+    <meta name="twitter:description" content="Contenido viral de lifestyle millonario. Acceso inmediato tras compra." />
+    <meta name="twitter:image" content="/twitter-image.jpg" />
     
-    <title>Mega Pack 30.000 Videos de Lujo - Reels, TikTok y Shorts | Oferta Limitada 18,95€</title>
+    <!-- Título optimizado para SEO y conversión -->
+    <title>🔥 30.000 Videos Premium de Lujo - Reels, TikTok, Shorts | Solo 18,95€ HOY</title>
     
-    <!-- Preload critical resources -->
+    <!-- Preload recursos críticos para velocidad -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://images.pexels.com">
     <link rel="preconnect" href="https://js.stripe.com">
+    <link rel="dns-prefetch" href="https://images.pexels.com">
     
-    <!-- Critical CSS for above-the-fold content -->
+    <!-- Preload font crítico -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" as="style">
+    
+    <!-- CSS crítico inline para above-the-fold -->
     <style>
+      /* Critical CSS para carga inmediata */
       body { 
         margin: 0; 
         background: #000; 
         color: #fff; 
-        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
       }
+      
       .loading { 
         display: flex; 
         justify-content: center; 
         align-items: center; 
         height: 100vh; 
-        background: #000;
+        background: #000;   
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
       }
+      
       .loading::after {
         content: '';
         width: 40px;
@@ -45,25 +66,133 @@
         border-radius: 50%;
         animation: spin 1s linear infinite;
       }
+      
       @keyframes spin {
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
       }
+      
+      /* Hero section crítico */
+      .hero-critical {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #000 0%, #1a1a1a 50%, #000 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        position: relative;
+      }
+      
+      .hero-title {
+        font-size: clamp(2rem, 8vw, 4rem);
+        font-weight: 800;
+        line-height: 1.1;
+        margin-bottom: 1rem;
+      }
+      
+      .hero-price {
+        font-size: clamp(3rem, 12vw, 6rem);
+        font-weight: 900;
+        background: linear-gradient(135deg, #ffd700, #ffed4e);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin: 1rem 0;
+      }
+      
+      /* Urgencia crítica */
+      .urgency-bar {
+        background: linear-gradient(135deg, #dc2626, #b91c1c);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 9999px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        animation: pulse 2s infinite;
+      }
+      
+      @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.8; }
+      }
+      
+      /* Stripe button crítico */
+      .cta-button {
+        background: linear-gradient(135deg, #ffd700, #ffed4e);
+        color: #000;
+        padding: 1rem 2rem;
+        border-radius: 12px;
+        font-weight: 800;
+        font-size: 1.1rem;
+        border: none;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+        box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+        margin: 1rem 0;
+      }
+      
+      .cta-button:hover {
+        transform: scale(1.05);
+      }
     </style>
   </head>
+  
   <body>
     <div id="root">
-      <div class="loading"></div>
+      <!-- Loading screen optimizado -->
+      <div class="loading" id="loading-screen"></div>
+      
+      <!-- Contenido crítico above-the-fold para evitar CLS -->
+      <div class="hero-critical" style="display: none;" id="hero-fallback">
+        <div style="max-width: 1200px; padding: 0 1rem;">
+          <div class="urgency-bar">
+            ⏰ OFERTA TERMINA HOY - NO PIERDAS ESTA OPORTUNIDAD
+          </div>
+          
+          <h1 class="hero-title">
+            <span style="color: #ffd700;">30.000 Videos</span><br>
+            <span style="color: white;">de Lujo Premium</span>
+          </h1>
+          
+          <p style="font-size: 1.2rem; color: #ccc; margin: 1rem 0;">
+            Contenido viral que usan los influencers para ganar <strong style="color: #ffd700;">6 cifras al mes</strong>
+          </p>
+          
+          <div style="text-decoration: line-through; color: #999;">Antes: 297,00 €</div>
+          <div class="hero-price">18,95€</div>
+          <div style="color: #ff4444; font-weight: bold;">¡94% DE DESCUENTO HOY!</div>
+          
+          <button class="cta-button" onclick="window.scrollTo(0,0)">
+            🔥 CONSEGUIR ACCESO INMEDIATO
+          </button>
+          
+          <p style="font-size: 0.9rem; color: #999; margin-top: 1rem;">
+            ⚡ Acceso instantáneo • 🔒 Pago 100% seguro • 💎 Garantía 30 días
+          </p>
+        </div>
+      </div>
     </div>
+    
+    <!-- Scripts optimizados -->
     <script type="module" src="/src/main.tsx"></script>
     
-    <!-- Stripe Script -->
+    <!-- Stripe Script con preload -->
     <script async src="https://js.stripe.com/v3/buy-button.js"></script>
     
-    <!-- Performance optimization script -->
+    <!-- Script crítico de optimización -->
     <script>
-      // Optimize images loading
+      // Optimización crítica: Remove loading screen cuando React carga
       document.addEventListener('DOMContentLoaded', function() {
+        // Hide loading after React loads
+        setTimeout(() => {
+          const loading = document.getElementById('loading-screen');
+          if (loading) loading.style.display = 'none';
+        }, 500);
+        
+        // Lazy loading para imágenes
         const images = document.querySelectorAll('img[data-src]');
         const imageObserver = new IntersectionObserver((entries, observer) => {
           entries.forEach(entry => {
@@ -71,19 +200,78 @@
               const img = entry.target;
               img.src = img.dataset.src;
               img.classList.remove('lazy');
+              img.classList.add('loaded');
               imageObserver.unobserve(img);
             }
           });
+        }, {
+          rootMargin: '50px'
         });
+        
         images.forEach(img => imageObserver.observe(img));
+        
+        // Preload recursos críticos de Stripe
+        const stripeLink = document.createElement('link');
+        stripeLink.rel = 'preload';
+        stripeLink.href = 'https://js.stripe.com/v3/buy-button.js';
+        stripeLink.as = 'script';
+        document.head.appendChild(stripeLink);
+        
+        // Optimización para videos en móvil
+        const videos = document.querySelectorAll('video');
+        videos.forEach(video => {
+          // Mejoras para rendimiento en móvil
+          video.playsInline = true;
+          video.muted = true;
+          
+          // Lazy loading para videos no críticos
+          if (!video.closest('.hero-section')) {
+            video.preload = 'none';
+          }
+        });
       });
       
-      // Preload critical Stripe resources
-      const link = document.createElement('link');
-      link.rel = 'preload';
-      link.href = 'https://js.stripe.com/v3/buy-button.js';
-      link.as = 'script';
-      document.head.appendChild(link);
+      // // Service Worker para cache (opcional)
+      // if ('serviceWorker' in navigator) {
+      //   window.addEventListener('load', function() {
+      //     navigator.serviceWorker.register('/sw.js')
+      //       .then(function(registration) {
+      //         console.log('SW registered: ', registration);
+      //       })
+      //       .catch(function(registrationError) {
+      //         console.log('SW registration failed: ', registrationError);
+      //       });
+      //   });
+      // }
+      
+      // // Google Analytics (si aplica)
+   
+      // window.dataLayer = window.dataLayer || [];
+      // function gtag(){dataLayer.push(arguments);}
+      // gtag('js', new Date());
+      // gtag('config', 'GA_TRACKING_ID');
+    </script>
+
+    <!-- Schema.org para SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      "name": "Mega Pack 30.000 Videos de Lujo Premium",
+      "description": "Colección premium de 30.000 videos de lifestyle de lujo para redes sociales. Coches, jets, yates y contenido millonario.",
+      "image": "/product-image.jpg",
+      "brand": {
+        "@type": "Brand",
+        "name": "Mega Pack Lujo"
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": "18.95",
+        "priceCurrency": "EUR",
+        "availability": "https://schema.org/LimitedAvailability",
+        "validThrough": "2024-12-31"
+      }
+    }
     </script>
   </body>
 </html>

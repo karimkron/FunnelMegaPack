@@ -2,7 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+/* Optimización crítica: carga solo fonts esenciales */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@400;600;700;800&display=swap');
 
 * {
   margin: 0;
@@ -20,14 +21,18 @@ body {
   color: #ffffff;
   line-height: 1.6;
   overflow-x: hidden;
+  /* Optimización crítica para móviles */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
-/* Custom serif font for elegant titles */
+/* Serif font para títulos elegantes */
 .font-serif {
   font-family: 'Playfair Display', serif;
 }
 
-/* Custom gradients */
+/* Gradientes personalizados optimizados */
 .bg-luxury-gradient {
   background: linear-gradient(135deg, #1a1a1a 0%, #000000 50%, #1a1a1a 100%);
 }
@@ -36,14 +41,10 @@ body {
   background: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #ffd700 100%);
 }
 
-/* Custom animations */
+/* Animaciones optimizadas para performance */
 @keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 
 .animate-shimmer {
@@ -52,35 +53,61 @@ body {
   background-size: 200% 100%;
 }
 
-/* Stripe button styling */
+@keyframes pulse-gold {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.animate-pulse-gold {
+  animation: pulse-gold 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Optimización crítica: Stripe button mejorado para conversión */
 .stripe-button-container {
   display: flex;
   justify-content: center;
   align-items: center;
+  margin: 1rem 0;
 }
 
 stripe-buy-button {
   --stripe-buy-button-background: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #ffd700 100%);
   --stripe-buy-button-text-color: #000000;
-  --stripe-buy-button-border-radius: 12px;
-  --stripe-buy-button-font-size: 18px;
-  --stripe-buy-button-font-weight: 700;
-  --stripe-buy-button-padding: 16px 32px;
-  --stripe-buy-button-border: 2px solid #ffd700;
+  --stripe-buy-button-border-radius: 16px;
+  --stripe-buy-button-font-size: 20px;
+  --stripe-buy-button-font-weight: 800;
+  --stripe-buy-button-padding: 18px 36px;
+  --stripe-buy-button-border: 3px solid #ffd700;
   --stripe-buy-button-hover-background: linear-gradient(135deg, #ffed4e 0%, #ffd700 50%, #ffed4e 100%);
-  --stripe-buy-button-hover-border: 2px solid #ffed4e;
+  --stripe-buy-button-hover-border: 3px solid #ffed4e;
   --stripe-buy-button-hover-text-color: #000000;
   transform: scale(1);
-  transition: all 0.3s ease;
-  box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 
+    0 10px 30px rgba(255, 215, 0, 0.4),
+    0 4px 8px rgba(0, 0, 0, 0.3);
+  filter: brightness(1);
 }
 
 stripe-buy-button:hover {
-  transform: scale(1.05);
-  box-shadow: 0 15px 40px rgba(255, 215, 0, 0.5);
+  transform: scale(1.05) translateY(-2px);
+  box-shadow: 
+    0 20px 40px rgba(255, 215, 0, 0.6),
+    0 8px 16px rgba(0, 0, 0, 0.4);
+  filter: brightness(1.1);
 }
 
-/* Custom scrollbar */
+/* Efectos hover de lujo */
+.luxury-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.luxury-hover:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 25px 50px -12px rgba(255, 215, 0, 0.25);
+}
+
+/* Optimización crítica: Scrollbar personalizado */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -98,39 +125,44 @@ stripe-buy-button:hover {
   background: linear-gradient(135deg, #ffed4e, #ffd700);
 }
 
-/* Responsive optimizations */
+/* Optimización para móviles */
 @media (max-width: 768px) {
-  .stripe-button-container stripe-buy-button {
-    --stripe-buy-button-font-size: 16px;
-    --stripe-buy-button-padding: 14px 28px;
+  body {
+    font-size: 14px;
+  }
+  
+  stripe-buy-button {
+    --stripe-buy-button-font-size: 18px;
+    --stripe-buy-button-padding: 16px 32px;
+    --stripe-buy-button-border-radius: 14px;
+  }
+  
+  /* Mejoras específicas para móvil */
+  .mobile-optimized {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
 }
 
-/* Loading animation */
-@keyframes pulse-gold {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.7;
-  }
+/* Optimización crítica: Videos más suaves en móvil */
+video {
+  /* Hardware acceleration para videos */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
 }
 
-.animate-pulse-gold {
-  animation: pulse-gold 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+/* Preload optimizations */
+.lazy {
+  opacity: 0;
+  transition: opacity 0.3s;
 }
 
-/* Luxury hover effects */
-.luxury-hover {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+.lazy.loaded {
+  opacity: 1;
 }
 
-.luxury-hover:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 25px 50px -12px rgba(255, 215, 0, 0.25);
-}
-
-/* Background patterns */
+/* Patrones de fondo de lujo */
 .bg-luxury-pattern {
   background-image: 
     radial-gradient(circle at 25% 25%, #ffd700 0%, transparent 50%),
@@ -138,7 +170,7 @@ stripe-buy-button:hover {
   opacity: 0.05;
 }
 
-/* Text selection */
+/* Selección de texto personalizada */
 ::selection {
   background-color: #ffd700;
   color: #000000;
@@ -147,4 +179,63 @@ stripe-buy-button:hover {
 ::-moz-selection {
   background-color: #ffd700;
   color: #000000;
+}
+
+/* Optimización crítica: Mejoras de performance para animaciones */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Critical CSS para above-the-fold */
+.hero-section {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.hero-background {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  padding: 0 1rem;
+}
+
+/* Mejoras específicas para el timer de urgencia */
+.urgency-timer {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  animation: pulse-red 2s infinite;
+  box-shadow: 0 4px 20px rgba(220, 38, 38, 0.5);
+}
+
+@keyframes pulse-red {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.9; transform: scale(1.02); }
+}
+
+/* Optimización para carga de imágenes */
+img {
+  max-width: 100%;
+  height: auto;
+  loading: lazy;
+}
+
+/* Fix para iOS Safari viewport */
+@supports (-webkit-touch-callout: none) {
+  .min-h-screen {
+    min-height: -webkit-fill-available;
+  }
 }
